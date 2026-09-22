@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { HeaderLogo } from './components/HeaderLogo';
 import { ActionButtons } from './components/ActionButtons';
@@ -12,7 +12,10 @@ import { BrandFooter } from './components/BrandFooter';
 import { CallModal } from './components/CallModal';
 import { WhatsAppModal } from './components/WhatsAppModal';
 import { ShareModal } from './components/ShareModal';
+import { OffersSection } from './components/OffersSection';
+import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { Language, translations } from './data/translations';
+import { AppCustomization, getStoredCustomization } from './data/customization';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<PageTab>('home');
@@ -20,6 +23,14 @@ export default function App() {
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+
+  // Dynamic Customization (Logo & Offers)
+  const [customData, setCustomData] = useState<AppCustomization>(getStoredCustomization());
+
+  useEffect(() => {
+    setCustomData(getStoredCustomization());
+  }, []);
 
   const t = translations[lang];
 
@@ -45,12 +56,14 @@ export default function App() {
       {/* Main Container - Optimized for mobile viewports (100% Mobile First) */}
       <main className="relative z-10 w-full max-w-md mx-auto px-3 sm:px-4 py-2 flex flex-col justify-between min-h-screen">
         <div className="space-y-3">
-          {/* Header & Logo with Language Switcher */}
+          {/* Header & Logo with 5-Tap Secret Admin Trigger */}
           <HeaderLogo
             compact={currentTab !== 'home'}
             onGoToBranches={() => handleTabChange('branches')}
             lang={lang}
             onToggleLang={toggleLanguage}
+            customLogoUrl={customData.logoUrl}
+            onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
           />
 
           {/* PAGE 1: HOME (الرئيسية) */}
@@ -67,6 +80,9 @@ export default function App() {
                 onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
                 onOpenLinksModal={() => setIsLinksModalOpen(true)}
               />
+
+              {/* Dynamic Offers Section (Managed via Hidden Admin Panel) */}
+              <OffersSection offers={customData.offers} lang={lang} />
 
               {/* Quick Branch Teaser Card */}
               <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#091224] to-[#070d1a] border border-blue-500/25 flex items-center justify-between gap-3">
@@ -133,11 +149,20 @@ export default function App() {
         <BrandFooter lang={lang} />
       </main>
 
-      {/* Modern Bottom Navigation Bar (Tabbed UI with Prices, Reviews & Multilingual) */}
+      {/* Modern Bottom Navigation Bar */}
       <BottomNavigation
         currentTab={currentTab}
         onTabChange={handleTabChange}
         lang={lang}
+      />
+
+      {/* Secret Admin Dashboard Modal (Opens on 5 taps on Logo + password 0001000) */}
+      <AdminDashboardModal
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
+        lang={lang}
+        currentData={customData}
+        onSave={(newData) => setCustomData(newData)}
       />
 
       {/* Modals */}

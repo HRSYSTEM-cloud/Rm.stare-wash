@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Clock, MapPin, ShieldCheck, Languages } from 'lucide-react';
 import { Language, translations } from '../data/translations';
-import officialLogo from '../assets/images/rm_star_official_logo_1790025610509.jpg';
+import officialLogo from '../assets/images/rm_star_exact_logo_1790089128681.jpg';
 
 interface HeaderLogoProps {
   onScrollToBranches?: () => void;
@@ -10,6 +10,8 @@ interface HeaderLogoProps {
   compact?: boolean;
   lang: Language;
   onToggleLang: () => void;
+  customLogoUrl?: string;
+  onTriggerSecretAdmin?: () => void;
 }
 
 export function HeaderLogo({
@@ -18,9 +20,16 @@ export function HeaderLogo({
   compact = false,
   lang,
   onToggleLang,
+  customLogoUrl,
+  onTriggerSecretAdmin,
 }: HeaderLogoProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<any>(null);
+  const [tapHint, setTapHint] = useState<number | null>(null);
+
   const t = translations[lang];
+  const activeLogo = customLogoUrl || officialLogo;
 
   const handleBranchesClick = () => {
     if (onGoToBranches) {
@@ -30,13 +39,46 @@ export function HeaderLogo({
     }
   };
 
+  // 5-Click Secret Admin Trigger
+  const handleLogoTap = () => {
+    clickCountRef.current += 1;
+    const count = clickCountRef.current;
+
+    // Show mini discreet feedback after 2nd tap
+    if (count >= 2 && count < 5) {
+      setTapHint(5 - count);
+    }
+
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+    }
+
+    if (count >= 5) {
+      clickCountRef.current = 0;
+      setTapHint(null);
+      if (onTriggerSecretAdmin) {
+        onTriggerSecretAdmin();
+      }
+      return;
+    }
+
+    // Reset counter if user stops tapping within 2.5 seconds
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+      setTapHint(null);
+    }, 2500);
+  };
+
   if (compact) {
     return (
       <header className="flex items-center justify-between px-3 py-2 rounded-2xl bg-[#080d19]/90 border border-blue-500/20 backdrop-blur-md relative z-10 mb-1">
         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-black border border-cyan-400/50 p-0.5 overflow-hidden shadow-[0_0_10px_rgba(0,180,255,0.4)] shrink-0">
+          <div
+            onClick={handleLogoTap}
+            className="w-10 h-10 rounded-xl bg-black border border-cyan-400/50 p-0.5 overflow-hidden shadow-[0_0_10px_rgba(0,180,255,0.4)] shrink-0 cursor-pointer active:scale-95 transition-transform"
+          >
             <img
-              src={officialLogo}
+              src={activeLogo}
               alt="RM.STAR"
               referrerPolicy="no-referrer"
               className="w-full h-full object-contain"
@@ -103,25 +145,34 @@ export function HeaderLogo({
         {/* Pulsing Outer Glow Ring */}
         <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-500 opacity-65 blur-lg group-hover:opacity-95 transition duration-700 animate-pulse" />
         
-        {/* Logo Card Frame (Mobile optimized aspect ratio & sleek rounded-2xl border) */}
-        <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-2xl sm:rounded-3xl p-[2.5px] bg-gradient-to-b from-cyan-400 via-blue-600 to-[#070e1c] shadow-[0_0_40px_rgba(0,140,255,0.55)]">
-          <div className="w-full h-full rounded-[14px] sm:rounded-[22px] bg-black overflow-hidden flex items-center justify-center relative border border-blue-400/40">
-            {/* The Official RM.STAR Logo */}
-            <img
-              src={officialLogo}
-              alt="RM.STAR STAR CAR WASH Logo"
-              referrerPolicy="no-referrer"
-              onLoad={() => setImageLoaded(true)}
-              onError={(e) => {
-                // Fallback to static public logo if bundler hash fails
-                const target = e.currentTarget;
-                if (target.src !== `${window.location.origin}/logo.jpg`) {
-                  target.src = '/logo.jpg';
-                }
-              }}
-              className="w-full h-full object-contain p-1 sm:p-2"
-            />
-          </div>
+        {/* Exact Logo Frame displaying the user's image as is with 5-tap listener */}
+        <div
+          onClick={handleLogoTap}
+          className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,140,255,0.4)] cursor-pointer select-none active:scale-[0.98] transition-transform"
+          title={lang === 'ar' ? 'شعار مغسلة RM.STAR' : 'RM.STAR Logo'}
+        >
+          <img
+            src={activeLogo}
+            alt="RM.STAR STAR CAR WASH Logo"
+            referrerPolicy="no-referrer"
+            onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (target.src !== `${window.location.origin}/logo.jpg`) {
+                target.src = '/logo.jpg';
+              }
+            }}
+            className="w-full h-full object-contain pointer-events-none"
+          />
+
+          {/* Discreet tap feedback indicator */}
+          {tapHint !== null && (
+            <div className="absolute inset-0 bg-cyan-950/40 backdrop-blur-[2px] flex items-center justify-center animate-fadeIn pointer-events-none">
+              <span className="px-3 py-1 rounded-full bg-black/80 border border-cyan-400 text-cyan-300 font-mono text-xs font-bold shadow-lg">
+                {lang === 'ar' ? `${tapHint} نقرات متبقية...` : `${tapHint} taps left...`}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* 24/7 Verified Mini Badge */}
