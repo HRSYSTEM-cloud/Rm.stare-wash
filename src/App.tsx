@@ -126,7 +126,7 @@ export default function App() {
           {/* PAGE 2: PRICING (قائمة الأسعار المعتمدة) */}
           {currentTab === 'prices' && (
             <div className="animate-fadeIn">
-              <PricingPage lang={lang} />
+              <PricingPage lang={lang} customData={customData} />
             </div>
           )}
 

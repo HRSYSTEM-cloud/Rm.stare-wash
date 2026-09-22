@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { BranchPricing, DEFAULT_PRICING_DATA } from './pricing';
 
 export interface AppOffer {
   id: string;
@@ -45,9 +46,11 @@ export interface AppCustomization {
   // Dynamic Contact & Links
   contacts?: BranchContactsConfig;
   socials?: SocialMediaAccounts;
+  // Dynamic Branch Pricing Data
+  pricing?: Record<string, BranchPricing>;
 }
 
-const STORAGE_KEY = 'rm_star_custom_data_v4';
+const STORAGE_KEY = 'rm_star_custom_data_v5';
 
 export const DEFAULT_OFFERS: AppOffer[] = [
   {
@@ -106,6 +109,7 @@ export function getLocalStoredCustomization(): AppCustomization {
         offers: parsed.offers || DEFAULT_OFFERS,
         contacts: { ...DEFAULT_CONTACTS, ...(parsed.contacts || {}) },
         socials: { ...DEFAULT_SOCIALS, ...(parsed.socials || {}) },
+        pricing: parsed.pricing || DEFAULT_PRICING_DATA,
       };
     }
   } catch (e) {
@@ -116,6 +120,7 @@ export function getLocalStoredCustomization(): AppCustomization {
     offers: DEFAULT_OFFERS,
     contacts: DEFAULT_CONTACTS,
     socials: DEFAULT_SOCIALS,
+    pricing: DEFAULT_PRICING_DATA,
   };
 }
 
@@ -139,6 +144,7 @@ export async function fetchCloudCustomization(): Promise<AppCustomization> {
         offers: data.offers || DEFAULT_OFFERS,
         contacts: { ...DEFAULT_CONTACTS, ...(data.contacts || {}) },
         socials: { ...DEFAULT_SOCIALS, ...(data.socials || {}) },
+        pricing: data.pricing || DEFAULT_PRICING_DATA,
       };
       saveLocalStoredCustomization(merged);
       return merged;
@@ -177,6 +183,7 @@ export function subscribeToCustomization(callback: (data: AppCustomization) => v
             offers: data.offers || DEFAULT_OFFERS,
             contacts: { ...DEFAULT_CONTACTS, ...(data.contacts || {}) },
             socials: { ...DEFAULT_SOCIALS, ...(data.socials || {}) },
+            pricing: data.pricing || DEFAULT_PRICING_DATA,
           };
           saveLocalStoredCustomization(merged);
           callback(merged);

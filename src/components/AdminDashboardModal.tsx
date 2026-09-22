@@ -17,6 +17,7 @@ import {
   Globe,
   Save,
   Star,
+  Coins,
 } from 'lucide-react';
 import {
   AppCustomization,
@@ -27,6 +28,7 @@ import {
   SocialMediaAccounts,
   saveCloudCustomization,
 } from '../data/customization';
+import { BranchPricing, DEFAULT_PRICING_DATA, PriceItem } from '../data/pricing';
 import { Language } from '../data/translations';
 
 interface AdminDashboardModalProps {
@@ -51,7 +53,7 @@ export function AdminDashboardModal({
   const [passwordError, setPasswordError] = useState(false);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'socials' | 'contacts' | 'reviews' | 'offers' | 'logo'>('reviews');
+  const [activeTab, setActiveTab] = useState<'prices' | 'reviews' | 'socials' | 'contacts' | 'offers' | 'logo'>('prices');
 
   // Form States
   const [logoUrl, setLogoUrl] = useState(currentData.logoUrl || '');
@@ -67,6 +69,12 @@ export function AdminDashboardModal({
   const [qurayniyyahWhatsapp, setQurayniyyahWhatsapp] = useState(currentData.contacts?.qurayniyyahWhatsapp || DEFAULT_CONTACTS.qurayniyyahWhatsapp);
   const [qurayniyyahMaps, setQurayniyyahMaps] = useState(currentData.contacts?.qurayniyyahMaps || DEFAULT_CONTACTS.qurayniyyahMaps);
   const [qurayniyyahReviewUrl, setQurayniyyahReviewUrl] = useState(currentData.contacts?.qurayniyyahReviewUrl || DEFAULT_CONTACTS.qurayniyyahReviewUrl || DEFAULT_CONTACTS.qurayniyyahMaps);
+
+  // Pricing Form State (Rabwah & Qurayniyyah)
+  const [pricingState, setPricingState] = useState<Record<string, BranchPricing>>(
+    currentData.pricing || DEFAULT_PRICING_DATA
+  );
+  const [selectedPricingBranch, setSelectedPricingBranch] = useState<'al-rabwah' | 'al-qurayniyyah'>('al-rabwah');
 
   // Full Social Media Accounts Form
   const [socials, setSocials] = useState<SocialMediaAccounts>({
@@ -122,6 +130,35 @@ export function AdminDashboardModal({
     }));
   };
 
+  // Price Modification Handlers
+  const handlePriceItemChange = (
+    branchId: string,
+    itemId: string,
+    field: 'small' | 'medium' | 'large',
+    val: string
+  ) => {
+    const numericVal = val === '' ? 0 : Number(val);
+    setPricingState((prev) => {
+      const branch = prev[branchId] || DEFAULT_PRICING_DATA[branchId];
+      const updatedItems = branch.items.map((item) => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            [field]: isNaN(numericVal) ? item[field] : numericVal,
+          };
+        }
+        return item;
+      });
+      return {
+        ...prev,
+        [branchId]: {
+          ...branch,
+          items: updatedItems,
+        },
+      };
+    });
+  };
+
   const handleSaveAll = async () => {
     setIsSaving(true);
     const updated: AppCustomization = {
@@ -139,6 +176,7 @@ export function AdminDashboardModal({
         qurayniyyahReviewUrl,
       },
       socials,
+      pricing: pricingState,
     };
     try {
       await saveCloudCustomization(updated);
@@ -155,12 +193,13 @@ export function AdminDashboardModal({
   };
 
   const handleResetToDefault = async () => {
-    if (confirm(lang === 'ar' ? 'هل أنت متأكد من استعادة الإعدادات الافتراضية كاملة؟' : 'Reset all data to default?')) {
+    if (confirm(lang === 'ar' ? 'هل أنت متأكد من استعادة الإعدادات والأسعار الافتراضية كاملة؟' : 'Reset all data and pricing to default?')) {
       const resetData: AppCustomization = {
         logoUrl: '',
         offers: DEFAULT_OFFERS,
         contacts: DEFAULT_CONTACTS,
         socials: DEFAULT_SOCIALS,
+        pricing: DEFAULT_PRICING_DATA,
       };
       setLogoUrl('');
       setOffers(DEFAULT_OFFERS);
@@ -173,6 +212,7 @@ export function AdminDashboardModal({
       setQurayniyyahMaps(DEFAULT_CONTACTS.qurayniyyahMaps);
       setQurayniyyahReviewUrl(DEFAULT_CONTACTS.qurayniyyahReviewUrl);
       setSocials(DEFAULT_SOCIALS);
+      setPricingState(DEFAULT_PRICING_DATA);
 
       await saveCloudCustomization(resetData);
       onSave(resetData);
@@ -212,9 +252,11 @@ export function AdminDashboardModal({
     setOffers(next);
   };
 
+  const currentBranchPricing = pricingState[selectedPricingBranch] || DEFAULT_PRICING_DATA[selectedPricingBranch];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="w-full max-w-lg bg-[#070b16] border border-cyan-400/40 rounded-2xl shadow-[0_0_50px_rgba(0,180,255,0.25)] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div className="w-full max-w-xl bg-[#070b16] border border-cyan-400/40 rounded-2xl shadow-[0_0_50px_rgba(0,180,255,0.25)] overflow-hidden my-auto max-h-[94vh] flex flex-col">
         {/* Header */}
         <div className="p-4 bg-gradient-to-r from-[#0a1226] via-[#0f1d3d] to-[#0a1226] border-b border-cyan-500/20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -229,7 +271,7 @@ export function AdminDashboardModal({
                 </span>
               </h3>
               <p className="text-[11px] text-slate-400">
-                {lang === 'ar' ? 'تعديل روابط تقييم قوقل، السوشل ميديا، أرقام الفروع والعروض' : 'Edit Google review links, socials, phones & offers'}
+                {lang === 'ar' ? 'تعديل الأسعار، روابط التقييم، أرقام الفروع، الحسابات والشعار' : 'Manage pricing, reviews, branches, socials & logo'}
               </p>
             </div>
           </div>
@@ -285,7 +327,20 @@ export function AdminDashboardModal({
             /* Authenticated Admin Management Tabs */
             <div className="space-y-4">
               {/* Navigation Tabs */}
-              <div className="grid grid-cols-5 gap-1 p-1 bg-[#040711] rounded-xl border border-blue-900/40">
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 bg-[#040711] rounded-xl border border-blue-900/40">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('prices')}
+                  className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                    activeTab === 'prices'
+                      ? 'bg-emerald-600 text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Coins className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>{lang === 'ar' ? 'الأسعار' : 'Pricing'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setActiveTab('reviews')}
@@ -309,7 +364,7 @@ export function AdminDashboardModal({
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5 text-cyan-300" />
-                  <span>{lang === 'ar' ? 'السوشل ميديا' : 'Socials'}</span>
+                  <span>{lang === 'ar' ? 'السوشل' : 'Socials'}</span>
                 </button>
 
                 <button
@@ -352,7 +407,146 @@ export function AdminDashboardModal({
                 </button>
               </div>
 
-              {/* 1. GOOGLE REVIEWS TAB (تعديل وتبديل روابط تقييمات قوقل ماب) */}
+              {/* 1. PRICING EDITING TAB (تعديل الأسعار لكل فرع ولكل حجم سيارة) */}
+              {activeTab === 'prices' && (
+                <div className="space-y-3.5 animate-fadeIn">
+                  <div className="p-3.5 rounded-xl bg-[#091526] border border-emerald-500/40 space-y-3 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-emerald-500/20">
+                      <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs">
+                        <Coins className="w-4 h-4 text-emerald-400" />
+                        <span>{lang === 'ar' ? 'تعديل أسعار الغسيل المعتمدة (بالريال السعودي)' : 'Manage Branch Washing Prices'}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {lang === 'ar'
+                        ? 'اختر الفرع ثم عدّل أسعار باقات الغسيل والإضافات لجميع أحجام السيارات (صغير، وسط، كبير). يتم التحديث فوراً في الموقع.'
+                        : 'Select the branch and adjust prices for Small, Medium, and Large vehicles.'}
+                    </p>
+
+                    {/* Branch Switcher for Pricing */}
+                    <div className="grid grid-cols-2 gap-2 p-1 bg-black/60 rounded-xl border border-slate-700">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPricingBranch('al-rabwah')}
+                        className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          selectedPricingBranch === 'al-rabwah'
+                            ? 'bg-red-600 text-white shadow'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-red-400" />
+                        <span>{lang === 'ar' ? 'فرع الربوة' : 'Al Rabwah'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPricingBranch('al-qurayniyyah')}
+                        className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          selectedPricingBranch === 'al-qurayniyyah'
+                            ? 'bg-blue-600 text-white shadow'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                        <span>{lang === 'ar' ? 'فرع القرينية' : 'Al Qurayniyyah'}</span>
+                      </button>
+                    </div>
+
+                    {/* Pricing Items Form */}
+                    <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                      {currentBranchPricing.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="p-3 rounded-xl bg-black/50 border border-slate-700/80 space-y-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white text-xs flex items-center gap-1.5">
+                              <span>{item.nameAr}</span>
+                              {item.isExtra && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-500/30">
+                                  إضافة
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {item.nameEn}
+                            </span>
+                          </div>
+
+                          {/* 3 Columns for Small, Medium, Large */}
+                          <div className="grid grid-cols-3 gap-2">
+                            {/* Small */}
+                            <div>
+                              <label className="block text-[10px] text-cyan-300 font-medium mb-1">
+                                صغير (ر.س)
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.small}
+                                onChange={(e) =>
+                                  handlePriceItemChange(
+                                    selectedPricingBranch,
+                                    item.id,
+                                    'small',
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#070b16] border border-cyan-500/30 text-white font-mono text-xs focus:border-cyan-400 focus:outline-none text-center font-bold"
+                              />
+                            </div>
+
+                            {/* Medium */}
+                            <div>
+                              <label className="block text-[10px] text-blue-300 font-medium mb-1">
+                                وسط (ر.س)
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.medium}
+                                onChange={(e) =>
+                                  handlePriceItemChange(
+                                    selectedPricingBranch,
+                                    item.id,
+                                    'medium',
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#070b16] border border-blue-500/30 text-white font-mono text-xs focus:border-blue-400 focus:outline-none text-center font-bold"
+                              />
+                            </div>
+
+                            {/* Large */}
+                            <div>
+                              <label className="block text-[10px] text-amber-300 font-medium mb-1">
+                                كبير / جيب (ر.س)
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={item.large}
+                                onChange={(e) =>
+                                  handlePriceItemChange(
+                                    selectedPricingBranch,
+                                    item.id,
+                                    'large',
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#070b16] border border-amber-500/30 text-white font-mono text-xs focus:border-amber-400 focus:outline-none text-center font-bold"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. GOOGLE REVIEWS TAB */}
               {activeTab === 'reviews' && (
                 <div className="space-y-3.5 animate-fadeIn">
                   <div className="p-3.5 rounded-xl bg-[#09152b] border border-amber-500/40 space-y-3 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
@@ -408,7 +602,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 2. SOCIAL MEDIA ACCOUNTS TAB */}
+              {/* 3. SOCIAL MEDIA ACCOUNTS TAB */}
               {activeTab === 'socials' && (
                 <div className="space-y-3.5 animate-fadeIn">
                   <div className="p-3.5 rounded-xl bg-[#091122] border border-cyan-500/30 space-y-3">
@@ -549,7 +743,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 3. CONTACTS & BRANCHES TAB */}
+              {/* 4. CONTACTS & BRANCHES TAB */}
               {activeTab === 'contacts' && (
                 <div className="space-y-4 animate-fadeIn">
                   {/* Branch 1: Rabwah */}
@@ -652,7 +846,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 4. OFFERS TAB */}
+              {/* 5. OFFERS TAB */}
               {activeTab === 'offers' && (
                 <div className="space-y-3 animate-fadeIn">
                   <div className="flex items-center justify-between">
@@ -741,7 +935,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 5. LOGO TAB */}
+              {/* 6. LOGO TAB */}
               {activeTab === 'logo' && (
                 <div className="space-y-4 animate-fadeIn">
                   <div className="p-3.5 rounded-xl bg-[#091122] border border-cyan-400/30 text-center space-y-3">
@@ -801,7 +995,7 @@ export function AdminDashboardModal({
                     type="button"
                     onClick={handleSaveAll}
                     disabled={isSaving}
-                    className="px-5 py-2.5 rounded-xl font-black text-black bg-gradient-to-r from-cyan-400 via-cyan-300 to-blue-500 hover:from-cyan-300 hover:to-blue-400 shadow-[0_0_20px_rgba(0,210,255,0.5)] transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl font-black text-black bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-500 hover:from-emerald-300 hover:to-blue-400 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     <span>{isSaving ? (lang === 'ar' ? 'جارِ الحفظ...' : 'Saving...') : (lang === 'ar' ? 'حفظ التعديلات سحابياً' : 'Save Changes')}</span>

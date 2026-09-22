@@ -17,7 +17,7 @@ export interface BranchPricing {
   items: PriceItem[];
 }
 
-export const PRICING_DATA: Record<string, BranchPricing> = {
+export const DEFAULT_PRICING_DATA: Record<string, BranchPricing> = {
   'al-rabwah': {
     branchId: 'al-rabwah',
     branchNameAr: 'فرع الربوة',
@@ -171,3 +171,5 @@ export const PRICING_DATA: Record<string, BranchPricing> = {
     ],
   },
 };
+
+export const PRICING_DATA = DEFAULT_PRICING_DATA;
