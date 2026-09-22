@@ -15,6 +15,7 @@ export const BASE_BRANCHES: BranchInfo[] = [
     displayPhone: '056 336 4380',
     whatsappNumber: '966563364380',
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
+    googleReviewUrl: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
     embedMapQuery: 'Jeddah+Al+Rabwah+King+Fahd+Road+Yahya+Al+Moalimi',
     isOpen24Hours: true,
     notes: 'موقع حيوي وسهل الوصول، خدمة غسيل سيارات متكاملة على مدار 24 ساعة',
@@ -32,6 +33,7 @@ export const BASE_BRANCHES: BranchInfo[] = [
     displayPhone: '054 858 9875',
     whatsappNumber: '966548589875',
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=21.3655,39.2612+(مغسلة+آر+إم+ستار+فرع+القرينية+جدة)',
+    googleReviewUrl: 'https://www.google.com/maps/search/?api=1&query=21.3655,39.2612+(مغسلة+آر+إم+ستار+فرع+القرينية+جدة)',
     embedMapQuery: 'Jeddah+Al+Qurayniyyah+Al+Sharif+Barakat+Ibn+Mohammad',
     isOpen24Hours: true,
     notes: 'أحدث معدات الغسيل السريع وغسيل البستم، مفتوح على مدار 24 ساعة',
@@ -56,24 +58,28 @@ export function getDynamicBranches(customData?: AppCustomization): BranchInfo[] 
       const p = contacts.rabwahPhone || b.phone;
       const w = contacts.rabwahWhatsapp || b.whatsappNumber;
       const m = contacts.rabwahMaps || b.googleMapsUrl;
+      const r = contacts.rabwahReviewUrl || m;
       return {
         ...b,
         phone: p,
         displayPhone: formatDisplayPhone(p),
         whatsappNumber: w,
         googleMapsUrl: m,
+        googleReviewUrl: r,
       };
     }
     if (b.id === 'al-qurayniyyah') {
       const p = contacts.qurayniyyahPhone || b.phone;
       const w = contacts.qurayniyyahWhatsapp || b.whatsappNumber;
       const m = contacts.qurayniyyahMaps || b.googleMapsUrl;
+      const r = contacts.qurayniyyahReviewUrl || m;
       return {
         ...b,
         phone: p,
         displayPhone: formatDisplayPhone(p),
         whatsappNumber: w,
         googleMapsUrl: m,
+        googleReviewUrl: r,
       };
     }
     return b;

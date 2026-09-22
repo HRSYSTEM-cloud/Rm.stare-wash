@@ -16,6 +16,7 @@ import {
   Share2,
   Globe,
   Save,
+  Star,
 } from 'lucide-react';
 import {
   AppCustomization,
@@ -50,7 +51,7 @@ export function AdminDashboardModal({
   const [passwordError, setPasswordError] = useState(false);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'socials' | 'contacts' | 'offers' | 'logo'>('socials');
+  const [activeTab, setActiveTab] = useState<'socials' | 'contacts' | 'reviews' | 'offers' | 'logo'>('reviews');
 
   // Form States
   const [logoUrl, setLogoUrl] = useState(currentData.logoUrl || '');
@@ -60,10 +61,12 @@ export function AdminDashboardModal({
   const [rabwahPhone, setRabwahPhone] = useState(currentData.contacts?.rabwahPhone || DEFAULT_CONTACTS.rabwahPhone);
   const [rabwahWhatsapp, setRabwahWhatsapp] = useState(currentData.contacts?.rabwahWhatsapp || DEFAULT_CONTACTS.rabwahWhatsapp);
   const [rabwahMaps, setRabwahMaps] = useState(currentData.contacts?.rabwahMaps || DEFAULT_CONTACTS.rabwahMaps);
+  const [rabwahReviewUrl, setRabwahReviewUrl] = useState(currentData.contacts?.rabwahReviewUrl || DEFAULT_CONTACTS.rabwahReviewUrl || DEFAULT_CONTACTS.rabwahMaps);
 
   const [qurayniyyahPhone, setQurayniyyahPhone] = useState(currentData.contacts?.qurayniyyahPhone || DEFAULT_CONTACTS.qurayniyyahPhone);
   const [qurayniyyahWhatsapp, setQurayniyyahWhatsapp] = useState(currentData.contacts?.qurayniyyahWhatsapp || DEFAULT_CONTACTS.qurayniyyahWhatsapp);
   const [qurayniyyahMaps, setQurayniyyahMaps] = useState(currentData.contacts?.qurayniyyahMaps || DEFAULT_CONTACTS.qurayniyyahMaps);
+  const [qurayniyyahReviewUrl, setQurayniyyahReviewUrl] = useState(currentData.contacts?.qurayniyyahReviewUrl || DEFAULT_CONTACTS.qurayniyyahReviewUrl || DEFAULT_CONTACTS.qurayniyyahMaps);
 
   // Full Social Media Accounts Form
   const [socials, setSocials] = useState<SocialMediaAccounts>({
@@ -129,9 +132,11 @@ export function AdminDashboardModal({
         rabwahPhone,
         rabwahWhatsapp,
         rabwahMaps,
+        rabwahReviewUrl,
         qurayniyyahPhone,
         qurayniyyahWhatsapp,
         qurayniyyahMaps,
+        qurayniyyahReviewUrl,
       },
       socials,
     };
@@ -162,9 +167,11 @@ export function AdminDashboardModal({
       setRabwahPhone(DEFAULT_CONTACTS.rabwahPhone);
       setRabwahWhatsapp(DEFAULT_CONTACTS.rabwahWhatsapp);
       setRabwahMaps(DEFAULT_CONTACTS.rabwahMaps);
+      setRabwahReviewUrl(DEFAULT_CONTACTS.rabwahReviewUrl);
       setQurayniyyahPhone(DEFAULT_CONTACTS.qurayniyyahPhone);
       setQurayniyyahWhatsapp(DEFAULT_CONTACTS.qurayniyyahWhatsapp);
       setQurayniyyahMaps(DEFAULT_CONTACTS.qurayniyyahMaps);
+      setQurayniyyahReviewUrl(DEFAULT_CONTACTS.qurayniyyahReviewUrl);
       setSocials(DEFAULT_SOCIALS);
 
       await saveCloudCustomization(resetData);
@@ -222,7 +229,7 @@ export function AdminDashboardModal({
                 </span>
               </h3>
               <p className="text-[11px] text-slate-400">
-                {lang === 'ar' ? 'تعديل السوشل ميديا، أرقام الجوالات، الشعار والعروض' : 'Edit social media, phones, logo & offers'}
+                {lang === 'ar' ? 'تعديل روابط تقييم قوقل، السوشل ميديا، أرقام الفروع والعروض' : 'Edit Google review links, socials, phones & offers'}
               </p>
             </div>
           </div>
@@ -278,11 +285,24 @@ export function AdminDashboardModal({
             /* Authenticated Admin Management Tabs */
             <div className="space-y-4">
               {/* Navigation Tabs */}
-              <div className="grid grid-cols-4 gap-1 p-1 bg-[#040711] rounded-xl border border-blue-900/40">
+              <div className="grid grid-cols-5 gap-1 p-1 bg-[#040711] rounded-xl border border-blue-900/40">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('reviews')}
+                  className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                    activeTab === 'reviews'
+                      ? 'bg-amber-600 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                  <span>{lang === 'ar' ? 'تقييم قوقل' : 'Reviews'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setActiveTab('socials')}
-                  className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
                     activeTab === 'socials'
                       ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(0,102,255,0.5)]'
                       : 'text-slate-400 hover:text-white'
@@ -295,20 +315,20 @@ export function AdminDashboardModal({
                 <button
                   type="button"
                   onClick={() => setActiveTab('contacts')}
-                  className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
                     activeTab === 'contacts'
                       ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(0,102,255,0.5)]'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <Phone className="w-3.5 h-3.5 text-cyan-300" />
-                  <span>{lang === 'ar' ? 'الأرقام والفروع' : 'Contacts'}</span>
+                  <span>{lang === 'ar' ? 'الفروع' : 'Branches'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveTab('offers')}
-                  className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
                     activeTab === 'offers'
                       ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(0,102,255,0.5)]'
                       : 'text-slate-400 hover:text-white'
@@ -321,7 +341,7 @@ export function AdminDashboardModal({
                 <button
                   type="button"
                   onClick={() => setActiveTab('logo')}
-                  className={`py-2 px-1 text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
                     activeTab === 'logo'
                       ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(0,102,255,0.5)]'
                       : 'text-slate-400 hover:text-white'
@@ -332,14 +352,70 @@ export function AdminDashboardModal({
                 </button>
               </div>
 
-              {/* 1. SOCIAL MEDIA ACCOUNTS TAB (جاهز بالكامل لتضع روابطك) */}
+              {/* 1. GOOGLE REVIEWS TAB (تعديل وتبديل روابط تقييمات قوقل ماب) */}
+              {activeTab === 'reviews' && (
+                <div className="space-y-3.5 animate-fadeIn">
+                  <div className="p-3.5 rounded-xl bg-[#09152b] border border-amber-500/40 space-y-3 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                    <div className="flex items-center gap-2 text-amber-300 font-bold text-xs pb-1 border-b border-amber-500/20">
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      <span>{lang === 'ar' ? 'روابط تقييمات قوقل ماب (Google Reviews Links)' : 'Google Maps Review URLs'}</span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {lang === 'ar'
+                        ? 'يمكنك هنا وضع رابط تقييم قوقل المباشر لكل فرع، أو رابط صفحة التقييم المختصرة (Google Review Shortlink) ليوجه العميل مباشرة إلى نافذة كتابة التقييم والـ 5 نجوم.'
+                        : 'Enter the direct Google review link for each branch to take customers straight to the review dialog.'}
+                    </p>
+
+                    <div className="space-y-3 pt-1">
+                      {/* Rabwah Review URL */}
+                      <div className="p-2.5 rounded-lg bg-black/60 border border-red-500/30">
+                        <label className="flex items-center gap-2 text-[11px] font-bold text-red-400 mb-1">
+                          <span className="w-2 h-2 rounded-full bg-red-400" />
+                          <span>{lang === 'ar' ? 'رابط تقييم فرع الربوة على Google Maps' : 'Rabwah Google Review Link'}</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={rabwahReviewUrl}
+                          onChange={(e) => setRabwahReviewUrl(e.target.value)}
+                          placeholder="https://g.page/r/.../review أو https://maps.google.com/..."
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#070b16] border border-slate-700 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 mt-1 block">
+                          {lang === 'ar' ? 'هذا الرابط يفتح عند ضغط الزائر على زر "تقييم فرع الربوة"' : 'Opens when user clicks Rabwah review button'}
+                        </span>
+                      </div>
+
+                      {/* Qurayniyyah Review URL */}
+                      <div className="p-2.5 rounded-lg bg-black/60 border border-blue-500/30">
+                        <label className="flex items-center gap-2 text-[11px] font-bold text-blue-400 mb-1">
+                          <span className="w-2 h-2 rounded-full bg-blue-400" />
+                          <span>{lang === 'ar' ? 'رابط تقييم فرع القرينية (الخمرة) على Google Maps' : 'Al Qurayniyyah Google Review Link'}</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={qurayniyyahReviewUrl}
+                          onChange={(e) => setQurayniyyahReviewUrl(e.target.value)}
+                          placeholder="https://g.page/r/.../review أو https://maps.google.com/..."
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#070b16] border border-slate-700 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 mt-1 block">
+                          {lang === 'ar' ? 'هذا الرابط يفتح عند ضغط الزائر على زر "تقييم فرع القرينية"' : 'Opens when user clicks Qurayniyyah review button'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. SOCIAL MEDIA ACCOUNTS TAB */}
               {activeTab === 'socials' && (
                 <div className="space-y-3.5 animate-fadeIn">
                   <div className="p-3.5 rounded-xl bg-[#091122] border border-cyan-500/30 space-y-3">
                     <div className="flex items-center justify-between pb-1.5 border-b border-cyan-500/20">
                       <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
                         <Share2 className="w-4 h-4 text-cyan-400" />
-                        <span>{lang === 'ar' ? 'روابط تطبيقات السوشل ميديا (أضف الرابط ويظهر تلقائياً)' : 'Social Media Accounts (Add link to activate)'}</span>
+                        <span>{lang === 'ar' ? 'روابط تطبيقات السوشل ميديا (أضف الرابط ويظهر تلقائياً)' : 'Social Media Accounts'}</span>
                       </div>
                     </div>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
@@ -473,7 +549,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 2. CONTACTS & BRANCHES TAB */}
+              {/* 3. CONTACTS & BRANCHES TAB */}
               {activeTab === 'contacts' && (
                 <div className="space-y-4 animate-fadeIn">
                   {/* Branch 1: Rabwah */}
@@ -512,7 +588,7 @@ export function AdminDashboardModal({
 
                       <div>
                         <label className="block text-[11px] font-medium text-slate-300 mb-1">
-                          {lang === 'ar' ? 'رابط خرائط جوجل (Google Maps Link)' : 'Google Maps URL'}
+                          {lang === 'ar' ? 'رابط خرائط جوجل وموقع الفرع (Google Maps)' : 'Google Maps Location URL'}
                         </label>
                         <input
                           type="text"
@@ -561,7 +637,7 @@ export function AdminDashboardModal({
 
                       <div>
                         <label className="block text-[11px] font-medium text-slate-300 mb-1">
-                          {lang === 'ar' ? 'رابط خرائط جوجل (Google Maps Link)' : 'Google Maps URL'}
+                          {lang === 'ar' ? 'رابط خرائط جوجل وموقع الفرع (Google Maps)' : 'Google Maps Location URL'}
                         </label>
                         <input
                           type="text"
@@ -576,7 +652,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 3. OFFERS TAB */}
+              {/* 4. OFFERS TAB */}
               {activeTab === 'offers' && (
                 <div className="space-y-3 animate-fadeIn">
                   <div className="flex items-center justify-between">
@@ -665,7 +741,7 @@ export function AdminDashboardModal({
                 </div>
               )}
 
-              {/* 4. LOGO TAB */}
+              {/* 5. LOGO TAB */}
               {activeTab === 'logo' && (
                 <div className="space-y-4 animate-fadeIn">
                   <div className="p-3.5 rounded-xl bg-[#091122] border border-cyan-400/30 text-center space-y-3">

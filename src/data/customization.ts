@@ -24,6 +24,17 @@ export interface SocialMediaAccounts {
   allLinksUrl?: string; // LinkTree or master page
 }
 
+export interface BranchContactsConfig {
+  rabwahPhone?: string;
+  rabwahWhatsapp?: string;
+  rabwahMaps?: string;
+  rabwahReviewUrl?: string; // Direct link to write a review on Google Maps for Rabwah
+  qurayniyyahPhone?: string;
+  qurayniyyahWhatsapp?: string;
+  qurayniyyahMaps?: string;
+  qurayniyyahReviewUrl?: string; // Direct link to write a review on Google Maps for Qurayniyyah
+}
+
 export interface AppCustomization {
   logoUrl?: string; // custom uploaded or external image url
   heroTitleAr?: string;
@@ -32,18 +43,11 @@ export interface AppCustomization {
   heroSubtitleEn?: string;
   offers: AppOffer[];
   // Dynamic Contact & Links
-  contacts?: {
-    rabwahPhone?: string;
-    rabwahWhatsapp?: string;
-    rabwahMaps?: string;
-    qurayniyyahPhone?: string;
-    qurayniyyahWhatsapp?: string;
-    qurayniyyahMaps?: string;
-  };
+  contacts?: BranchContactsConfig;
   socials?: SocialMediaAccounts;
 }
 
-const STORAGE_KEY = 'rm_star_custom_data_v3';
+const STORAGE_KEY = 'rm_star_custom_data_v4';
 
 export const DEFAULT_OFFERS: AppOffer[] = [
   {
@@ -69,13 +73,15 @@ export const DEFAULT_OFFERS: AppOffer[] = [
   },
 ];
 
-export const DEFAULT_CONTACTS = {
+export const DEFAULT_CONTACTS: BranchContactsConfig = {
   rabwahPhone: '0563364380',
   rabwahWhatsapp: '966563364380',
   rabwahMaps: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
+  rabwahReviewUrl: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
   qurayniyyahPhone: '0548589875',
   qurayniyyahWhatsapp: '966548589875',
   qurayniyyahMaps: 'https://www.google.com/maps/search/?api=1&query=21.3655,39.2612+(مغسلة+آر+إم+ستار+فرع+القرينية+جدة)',
+  qurayniyyahReviewUrl: 'https://www.google.com/maps/search/?api=1&query=21.3655,39.2612+(مغسلة+آر+إم+ستار+فرع+القرينية+جدة)',
 };
 
 export const DEFAULT_SOCIALS: SocialMediaAccounts = {
@@ -144,10 +150,7 @@ export async function fetchCloudCustomization(): Promise<AppCustomization> {
 }
 
 export async function saveCloudCustomization(data: AppCustomization): Promise<void> {
-  // Always update local cache instantly
   saveLocalStoredCustomization(data);
-
-  // Sync to Firebase Cloud Firestore
   try {
     const docRef = doc(db, 'settings', 'customization');
     await setDoc(docRef, {

@@ -151,7 +151,7 @@ export default function App() {
           {/* PAGE 5: GOOGLE REVIEWS (تقييمات قوقل) */}
           {currentTab === 'reviews' && (
             <div className="animate-fadeIn">
-              <GoogleReviewsPage lang={lang} />
+              <GoogleReviewsPage lang={lang} customData={customData} />
             </div>
           )}
 

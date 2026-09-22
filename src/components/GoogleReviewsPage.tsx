@@ -1,14 +1,21 @@
-import { useState } from 'react';
-import { Star, ExternalLink, Sparkles, MessageSquare, CheckCircle2, HeartHandshake } from 'lucide-react';
-import { BRANCHES } from '../data/branches';
+import { Star, ExternalLink, HeartHandshake, CheckCircle2 } from 'lucide-react';
+import { getDynamicBranches } from '../data/branches';
 import { Language, translations } from '../data/translations';
+import { AppCustomization } from '../data/customization';
 
 interface GoogleReviewsPageProps {
   lang: Language;
+  customData?: AppCustomization;
 }
 
-export function GoogleReviewsPage({ lang }: GoogleReviewsPageProps) {
+export function GoogleReviewsPage({ lang, customData }: GoogleReviewsPageProps) {
   const t = translations[lang];
+  const branches = getDynamicBranches(customData);
+  const rabwah = branches.find((b) => b.id === 'al-rabwah') || branches[0];
+  const qurayniyyah = branches.find((b) => b.id === 'al-qurayniyyah') || branches[1];
+
+  const rabwahReviewUrl = rabwah.googleReviewUrl || rabwah.googleMapsUrl;
+  const qurayniyyahReviewUrl = qurayniyyah.googleReviewUrl || qurayniyyah.googleMapsUrl;
 
   return (
     <div className="space-y-4 pt-1 animate-fadeIn">
@@ -54,11 +61,11 @@ export function GoogleReviewsPage({ lang }: GoogleReviewsPageProps) {
           {t.reviewCardDesc}
         </p>
 
-        {/* Real Direct Branch Review Buttons */}
+        {/* Real Direct Branch Review Buttons (Dynamic from Cloud Admin) */}
         <div className="mt-4 space-y-2.5">
           {/* Branch 1: Rabwah */}
           <a
-            href={BRANCHES[0].googleMapsUrl}
+            href={rabwahReviewUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between p-3.5 rounded-xl bg-[#0a1224] hover:bg-[#0f1b34] border border-cyan-400/50 text-white transition-all group shadow-[0_0_12px_rgba(0,210,255,0.2)]"
@@ -82,7 +89,7 @@ export function GoogleReviewsPage({ lang }: GoogleReviewsPageProps) {
 
           {/* Branch 2: Qurayniyyah */}
           <a
-            href={BRANCHES[1].googleMapsUrl}
+            href={qurayniyyahReviewUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between p-3.5 rounded-xl bg-[#0a1224] hover:bg-[#0f1b34] border border-cyan-400/50 text-white transition-all group shadow-[0_0_12px_rgba(0,210,255,0.2)]"

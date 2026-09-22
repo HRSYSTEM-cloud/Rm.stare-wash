@@ -11,6 +11,7 @@ export interface BranchInfo {
   displayPhone: string;
   whatsappNumber: string;
   googleMapsUrl: string;
+  googleReviewUrl?: string; // Direct link for customers to post a review on Google Maps
   embedMapQuery: string;
   isOpen24Hours: boolean;
   notes?: string;
