@@ -1,0 +1,6 @@
+{
+  "name": "RM.STAR | STAR CAR WASH",
+  "description": "مغسلة آر إم ستار للسيارات في جدة — فروعنا في حي الربوة وحي القرينية. عناية واحترافية على مدار 24 ساعة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
