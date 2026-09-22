@@ -5,12 +5,11 @@ import firebaseConfig from '../../firebase-applet-config.json';
 // Initialize Firebase App
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Firestore using the configured database ID
-export const db = firebaseConfig.firestoreDatabaseId
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
+// Initialize Firestore for standard default database or custom ID
+const dbId = (firebaseConfig as any).firestoreDatabaseId;
+export const db = dbId ? getFirestore(app, dbId) : getFirestore(app);
 
-// Validate connection on startup as recommended
+// Validate connection on startup
 export async function validateFirestoreConnection(): Promise<boolean> {
   try {
     await getDocFromServer(doc(db, 'settings', 'customization'));
