@@ -1,22 +1,26 @@
 import { useState } from 'react';
-import { BRANCHES } from '../data/branches';
 import { BranchCard } from './BranchCard';
-import { MapPin, Navigation, Clock } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { Language, translations } from '../data/translations';
+import { AppCustomization } from '../data/customization';
+import { getDynamicBranches } from '../data/branches';
 
 interface BranchesSectionProps {
   highlightedBranchId?: string;
   lang: Language;
+  customData?: AppCustomization;
 }
 
-export function BranchesSection({ highlightedBranchId, lang }: BranchesSectionProps) {
+export function BranchesSection({ highlightedBranchId, lang, customData }: BranchesSectionProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'al-rabwah' | 'al-qurayniyyah'>('all');
   const t = translations[lang];
 
+  const currentBranches = getDynamicBranches(customData);
+
   const filteredBranches =
     activeTab === 'all'
-      ? BRANCHES
-      : BRANCHES.filter((b) => b.id === activeTab);
+      ? currentBranches
+      : currentBranches.filter((b) => b.id === activeTab);
 
   return (
     <section id="branches-section" className="w-full max-w-md mx-auto px-1 py-2 space-y-3 relative z-10">
@@ -68,13 +72,13 @@ export function BranchesSection({ highlightedBranchId, lang }: BranchesSectionPr
         </button>
       </div>
 
-      {/* Branches List */}
-      <div className="space-y-4">
+      {/* Branches Cards List */}
+      <div className="space-y-3">
         {filteredBranches.map((branch) => (
           <BranchCard
             key={branch.id}
             branch={branch}
-            isHighlighted={branch.id === highlightedBranchId}
+            isHighlighted={highlightedBranchId === branch.id}
             lang={lang}
           />
         ))}

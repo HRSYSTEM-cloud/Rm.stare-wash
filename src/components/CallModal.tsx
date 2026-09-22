@@ -1,16 +1,19 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Phone, MapPin, Clock } from 'lucide-react';
-import { BRANCHES } from '../data/branches';
 import { Language, translations } from '../data/translations';
+import { AppCustomization } from '../data/customization';
+import { getDynamicBranches } from '../data/branches';
 
 interface CallModalProps {
   isOpen: boolean;
   onClose: () => void;
   lang: Language;
+  customData?: AppCustomization;
 }
 
-export function CallModal({ isOpen, onClose, lang }: CallModalProps) {
+export function CallModal({ isOpen, onClose, lang, customData }: CallModalProps) {
   const t = translations[lang];
+  const dynamicBranches = getDynamicBranches(customData);
 
   return (
     <AnimatePresence>
@@ -56,55 +59,56 @@ export function CallModal({ isOpen, onClose, lang }: CallModalProps) {
 
             {/* Branch Calling Cards */}
             <div className="space-y-3">
-              {BRANCHES.map((branch) => {
+              {dynamicBranches.map((branch) => {
                 const isRabwah = branch.id === 'al-rabwah';
-                const branchName = lang === 'ar'
-                  ? branch.name
-                  : isRabwah
-                    ? 'Al Rabwah Branch'
-                    : 'Al Qurayniyyah Branch';
-
-                const branchDist = lang === 'ar'
-                  ? branch.district
-                  : isRabwah
-                    ? 'Al Rabwah Dist.'
-                    : 'Al Qurayniyyah Dist.';
-
                 return (
-                  <div
+                  <a
                     key={branch.id}
-                    className="p-3 rounded-xl bg-[#0e162b] border border-blue-500/30 space-y-2.5"
+                    href={`tel:${branch.phone}`}
+                    className={`block p-3.5 rounded-xl border transition-all ${
+                      isRabwah
+                        ? 'bg-[#150d18] border-red-500/40 hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                        : 'bg-[#0d1627] border-blue-500/40 hover:border-blue-400 hover:shadow-[0_0_20px_rgba(0,102,255,0.4)]'
+                    }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${branch.badgeColor}`}>
-                          {lang === 'ar' ? branch.badgeLabel : (isRabwah ? '🔴 Al Rabwah' : '🔵 Al Qurayniyyah')}
-                        </span>
-                        <span className="text-xs text-white font-bold">{branchName}</span>
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center text-white ${
+                            isRabwah ? 'bg-red-600/80' : 'bg-blue-600/80'
+                          }`}
+                        >
+                          <Phone className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-white">
+                            {lang === 'ar'
+                              ? branch.name
+                              : isRabwah
+                                ? 'Al Rabwah Branch'
+                                : 'Al Qurayniyyah Branch'}
+                          </div>
+                          <div className="text-xs font-mono text-cyan-300 tracking-wide font-bold">
+                            {branch.displayPhone}
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5" />
-                        <span>24/7</span>
+                      <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-cyan-400 text-black shadow-[0_0_10px_#00e5ff]">
+                        {lang === 'ar' ? 'اتصال 📞' : 'Call 📞'}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
-                      <span className="text-xs font-mono text-cyan-300 font-bold" dir="ltr">
-                        {branch.displayPhone}
+                    <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-cyan-400" />
+                        {branch.district}
                       </span>
-                      <a
-                        href={`tel:${branch.phone}`}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all shadow-[0_0_12px_rgba(0,140,255,0.4)] ${
-                          isRabwah
-                            ? 'bg-red-600 hover:bg-red-500'
-                            : 'bg-blue-600 hover:bg-blue-500'
-                        }`}
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>{t.callBranch}</span>
-                      </a>
+                      <span className="flex items-center gap-1 text-emerald-400 font-medium">
+                        <Clock className="w-3 h-3" />
+                        {lang === 'ar' ? '24 ساعة' : '24/7'}
+                      </span>
                     </div>
-                  </div>
+                  </a>
                 );
               })}
             </div>

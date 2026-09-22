@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Clock, MapPin, ShieldCheck, Languages } from 'lucide-react';
+import { Sparkles, Clock, MapPin, ShieldCheck } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 import officialLogo from '../assets/images/rm_star_exact_logo_1790089128681.jpg';
 
@@ -23,10 +23,9 @@ export function HeaderLogo({
   customLogoUrl,
   onTriggerSecretAdmin,
 }: HeaderLogoProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [, setImageLoaded] = useState(false);
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<any>(null);
-  const [tapHint, setTapHint] = useState<number | null>(null);
 
   const t = translations[lang];
   const activeLogo = customLogoUrl || officialLogo;
@@ -39,15 +38,10 @@ export function HeaderLogo({
     }
   };
 
-  // 5-Click Secret Admin Trigger
+  // 100% Completely Stealth & Hidden Trigger: 5 rapid taps on logo with NO text/hint shown
   const handleLogoTap = () => {
     clickCountRef.current += 1;
     const count = clickCountRef.current;
-
-    // Show mini discreet feedback after 2nd tap
-    if (count >= 2 && count < 5) {
-      setTapHint(5 - count);
-    }
 
     if (clickTimerRef.current) {
       clearTimeout(clickTimerRef.current);
@@ -55,100 +49,41 @@ export function HeaderLogo({
 
     if (count >= 5) {
       clickCountRef.current = 0;
-      setTapHint(null);
       if (onTriggerSecretAdmin) {
         onTriggerSecretAdmin();
       }
-      return;
+    } else {
+      // Reset count if idle for more than 1.5 seconds
+      clickTimerRef.current = setTimeout(() => {
+        clickCountRef.current = 0;
+      }, 1500);
     }
-
-    // Reset counter if user stops tapping within 2.5 seconds
-    clickTimerRef.current = setTimeout(() => {
-      clickCountRef.current = 0;
-      setTapHint(null);
-    }, 2500);
   };
 
-  if (compact) {
-    return (
-      <header className="flex items-center justify-between px-3 py-2 rounded-2xl bg-[#080d19]/90 border border-blue-500/20 backdrop-blur-md relative z-10 mb-1">
-        <div className="flex items-center gap-2.5">
-          <div
-            onClick={handleLogoTap}
-            className="w-10 h-10 rounded-xl bg-black border border-cyan-400/50 p-0.5 overflow-hidden shadow-[0_0_10px_rgba(0,180,255,0.4)] shrink-0 cursor-pointer active:scale-95 transition-transform"
-          >
-            <img
-              src={activeLogo}
-              alt="RM.STAR"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div className="text-start">
-            <div className="text-xs font-black text-white flex items-center gap-1.5">
-              <span>RM.STAR</span>
-              <span className="text-[10px] text-cyan-400">STAR CAR WASH</span>
-            </div>
-            <p className="text-[10px] text-slate-300">{t.tagline}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Language Switch Button */}
-          <button
-            onClick={onToggleLang}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-900/40 border border-cyan-400/40 text-cyan-300 hover:text-white text-[11px] font-bold transition-all"
-            title="Switch Language"
-          >
-            <Languages className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{lang === 'ar' ? 'English' : 'عربي'}</span>
-          </button>
-
-          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-950/80 border border-cyan-400/40 text-[10px] font-bold text-cyan-300 whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>{t.open247}</span>
-          </div>
-        </div>
-      </header>
-    );
-  }
-
   return (
-    <header className="flex flex-col items-center text-center px-3 pt-4 pb-2 relative z-10">
-      {/* Ambient Electric Blue Glow in Background */}
-      <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-blue-600/20 rounded-full blur-[90px] pointer-events-none" />
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/15 rounded-full blur-[60px] pointer-events-none" />
-
+    <header className="w-full max-w-md mx-auto px-4 pt-4 pb-2 text-center relative z-10 flex flex-col items-center">
       {/* Top Utility Bar: Language Switcher */}
-      <div className="w-full flex items-center justify-between mb-3 px-1">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-950/70 border border-blue-500/30 text-slate-300 text-[11px] font-bold">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>جدة &bull; Jeddah</span>
-        </div>
-
+      <div className="w-full flex items-center justify-end mb-2">
         <button
           onClick={onToggleLang}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-blue-950 to-[#081226] border border-cyan-400/50 hover:border-cyan-300 text-cyan-300 hover:text-white text-xs font-black shadow-[0_0_12px_rgba(0,210,255,0.3)] transition-all"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-500/40 text-cyan-300 text-xs font-bold hover:bg-blue-900/80 hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,102,255,0.3)] active:scale-95"
+          title={lang === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'}
         >
-          <Languages className="w-3.5 h-3.5 text-cyan-400" />
-          <span>{lang === 'ar' ? 'English' : 'العربية'}</span>
+          <span>🌐</span>
+          <span>{lang === 'ar' ? 'English' : 'عربي'}</span>
         </button>
       </div>
 
-      {/* Centered Logo Container */}
+      {/* Main Brand Logo - Stealth click trigger with NO hints */}
       <motion.div
-        initial={{ scale: 0.88, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative group mb-4"
+        transition={{ duration: 0.4 }}
+        className="relative mb-3 group"
       >
-        {/* Pulsing Outer Glow Ring */}
-        <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-500 opacity-65 blur-lg group-hover:opacity-95 transition duration-700 animate-pulse" />
-        
-        {/* Exact Logo Frame displaying the user's image as is with 5-tap listener */}
         <div
           onClick={handleLogoTap}
-          className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,140,255,0.4)] cursor-pointer select-none active:scale-[0.98] transition-transform"
+          className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,140,255,0.4)] cursor-pointer select-none active:scale-[0.99] transition-transform"
           title={lang === 'ar' ? 'شعار مغسلة RM.STAR' : 'RM.STAR Logo'}
         >
           <img
@@ -164,15 +99,6 @@ export function HeaderLogo({
             }}
             className="w-full h-full object-contain pointer-events-none"
           />
-
-          {/* Discreet tap feedback indicator */}
-          {tapHint !== null && (
-            <div className="absolute inset-0 bg-cyan-950/40 backdrop-blur-[2px] flex items-center justify-center animate-fadeIn pointer-events-none">
-              <span className="px-3 py-1 rounded-full bg-black/80 border border-cyan-400 text-cyan-300 font-mono text-xs font-bold shadow-lg">
-                {lang === 'ar' ? `${tapHint} نقرات متبقية...` : `${tapHint} taps left...`}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* 24/7 Verified Mini Badge */}
@@ -205,7 +131,7 @@ export function HeaderLogo({
           {lang === 'ar' ? (
             <>مغسلة <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_15px_rgba(0,102,255,0.5)]">آر إم ستار</span> للسيارات</>
           ) : (
-            <><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_15px_rgba(0,102,255,0.5)]">RM.STAR</span> Car Wash & Detailing</>
+            <><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_15px_rgba(0,102,255,0.5)]">RM.STAR</span> Star Car Wash</>
           )}
         </h1>
 

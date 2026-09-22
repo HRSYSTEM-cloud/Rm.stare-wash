@@ -1,6 +1,7 @@
 import { BranchInfo, ServiceHighlight, SocialLink } from '../types';
+import { AppCustomization, DEFAULT_CONTACTS, DEFAULT_SOCIALS } from './customization';
 
-export const BRANCHES: BranchInfo[] = [
+export const BASE_BRANCHES: BranchInfo[] = [
   {
     id: 'al-rabwah',
     name: 'فرع الربوة — جدة',
@@ -16,7 +17,7 @@ export const BRANCHES: BranchInfo[] = [
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
     embedMapQuery: 'Jeddah+Al+Rabwah+King+Fahd+Road+Yahya+Al+Moalimi',
     isOpen24Hours: true,
-    notes: 'موقع حيوي وسهل الوصول، خدمة غسيل وتلميع على مدار 24 ساعة',
+    notes: 'موقع حيوي وسهل الوصول، خدمة غسيل سيارات متكاملة على مدار 24 ساعة',
   },
   {
     id: 'al-qurayniyyah',
@@ -33,65 +34,199 @@ export const BRANCHES: BranchInfo[] = [
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=21.3655,39.2612+(مغسلة+آر+إم+ستار+فرع+القرينية+جدة)',
     embedMapQuery: 'Jeddah+Al+Qurayniyyah+Al+Sharif+Barakat+Ibn+Mohammad',
     isOpen24Hours: true,
-    notes: 'أحدث معدات الغسيل السريع والتلميع الاحترافي، مفتوح على مدار 24 ساعة',
+    notes: 'أحدث معدات الغسيل السريع وغسيل البستم، مفتوح على مدار 24 ساعة',
   },
 ];
 
-export const SOCIAL_LINKS: SocialLink[] = [
-  {
-    id: 'tiktok',
-    title: 'TikTok | تيك توك الرسمي',
-    subtitle: '@rm.star.carwash',
-    url: 'https://www.tiktok.com/@rm.star.carwash',
-    iconName: 'tiktok',
-    highlight: true,
-  },
-  {
+// Helper to format 05XXXXXXXX to 05X XXX XXXX
+function formatDisplayPhone(phone: string): string {
+  const clean = phone.replace(/\s+/g, '');
+  if (clean.length === 10) {
+    return `${clean.slice(0, 3)} ${clean.slice(3, 6)} ${clean.slice(6)}`;
+  }
+  return clean;
+}
+
+// Generate dynamic branches merging custom saved cloud admin values
+export function getDynamicBranches(customData?: AppCustomization): BranchInfo[] {
+  const contacts = customData?.contacts || DEFAULT_CONTACTS;
+
+  return BASE_BRANCHES.map((b) => {
+    if (b.id === 'al-rabwah') {
+      const p = contacts.rabwahPhone || b.phone;
+      const w = contacts.rabwahWhatsapp || b.whatsappNumber;
+      const m = contacts.rabwahMaps || b.googleMapsUrl;
+      return {
+        ...b,
+        phone: p,
+        displayPhone: formatDisplayPhone(p),
+        whatsappNumber: w,
+        googleMapsUrl: m,
+      };
+    }
+    if (b.id === 'al-qurayniyyah') {
+      const p = contacts.qurayniyyahPhone || b.phone;
+      const w = contacts.qurayniyyahWhatsapp || b.whatsappNumber;
+      const m = contacts.qurayniyyahMaps || b.googleMapsUrl;
+      return {
+        ...b,
+        phone: p,
+        displayPhone: formatDisplayPhone(p),
+        whatsappNumber: w,
+        googleMapsUrl: m,
+      };
+    }
+    return b;
+  });
+}
+
+export const BRANCHES: BranchInfo[] = BASE_BRANCHES;
+
+// Helper to build list of active social media links according to what the user configured in admin
+export function getDynamicSocialLinks(customData?: AppCustomization): SocialLink[] {
+  const socials = customData?.socials || DEFAULT_SOCIALS;
+  const contacts = customData?.contacts || DEFAULT_CONTACTS;
+
+  const links: SocialLink[] = [];
+
+  // 1. TikTok
+  if (socials.tiktokUrl && socials.tiktokUrl.trim() !== '') {
+    links.push({
+      id: 'tiktok',
+      title: 'TikTok | تيك توك الرسمي',
+      subtitle: '@rm.star.carwash',
+      url: socials.tiktokUrl,
+      iconName: 'tiktok',
+      highlight: true,
+    });
+  }
+
+  // 2. Snapchat
+  if (socials.snapchatUrl && socials.snapchatUrl.trim() !== '') {
+    links.push({
+      id: 'snapchat',
+      title: 'Snapchat | سناب شات',
+      subtitle: 'يوميات وعروض المغسلة الحصرية',
+      url: socials.snapchatUrl,
+      iconName: 'snapchat',
+      highlight: true,
+    });
+  }
+
+  // 3. Instagram
+  if (socials.instagramUrl && socials.instagramUrl.trim() !== '') {
+    links.push({
+      id: 'instagram',
+      title: 'Instagram | انستغرام',
+      subtitle: 'أحدث صور وفيديوهات الغسيل',
+      url: socials.instagramUrl,
+      iconName: 'instagram',
+    });
+  }
+
+  // 4. X (Twitter)
+  if (socials.xTwitterUrl && socials.xTwitterUrl.trim() !== '') {
+    links.push({
+      id: 'twitter',
+      title: 'منصة إكس | X (Twitter)',
+      subtitle: 'أخبار وتحديثات RM.STAR',
+      url: socials.xTwitterUrl,
+      iconName: 'twitter',
+    });
+  }
+
+  // 5. YouTube
+  if (socials.youtubeUrl && socials.youtubeUrl.trim() !== '') {
+    links.push({
+      id: 'youtube',
+      title: 'YouTube | يوتيوب',
+      subtitle: 'شروحات وفيديوهات نتائج الغسيل',
+      url: socials.youtubeUrl,
+      iconName: 'youtube',
+    });
+  }
+
+  // 6. Facebook
+  if (socials.facebookUrl && socials.facebookUrl.trim() !== '') {
+    links.push({
+      id: 'facebook',
+      title: 'Facebook | فيسبوك',
+      subtitle: 'صفحتنا الرسمية على فيسبوك',
+      url: socials.facebookUrl,
+      iconName: 'facebook',
+    });
+  }
+
+  // 7. Telegram
+  if (socials.telegramUrl && socials.telegramUrl.trim() !== '') {
+    links.push({
+      id: 'telegram',
+      title: 'Telegram | قناة التليجرام',
+      subtitle: 'تنبيهات العروض الحصرية أولاً بأول',
+      url: socials.telegramUrl,
+      iconName: 'telegram',
+    });
+  }
+
+  // 8. WhatsApp Rabwah
+  const rabwahWhatsapp = contacts.rabwahWhatsapp || DEFAULT_CONTACTS.rabwahWhatsapp;
+  links.push({
     id: 'whatsapp-rabwah',
     title: 'واتساب فرع الربوة',
-    subtitle: '056 336 4380 — محادثة فورية',
-    url: 'https://wa.me/966563364380?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D9%85%D8%BA%D8%B3%D9%84%D8%A9%20RM.STAR%20%D9%81%D8%B1%D8%B9%20%D8%A7%D9%84%D8%B1%D8%A8%D9%88%D8%A9',
+    subtitle: `${formatDisplayPhone(contacts.rabwahPhone || '0563364380')} — محادثة فورية`,
+    url: `https://wa.me/${rabwahWhatsapp}?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D9%85%D8%BA%D8%B3%D9%84%D8%A9%20RM.STAR%20%D9%81%D8%B1%D8%B9%20%D8%A7%D9%84%D8%B1%D8%A8%D9%88%D8%A9`,
     iconName: 'whatsapp',
-  },
-  {
+  });
+
+  // 9. WhatsApp Qurayniyyah
+  const qurayniyyahWhatsapp = contacts.qurayniyyahWhatsapp || DEFAULT_CONTACTS.qurayniyyahWhatsapp;
+  links.push({
     id: 'whatsapp-qurayniyyah',
     title: 'واتساب فرع القرينية',
-    subtitle: '054 858 9875 — محادثة فورية',
-    url: 'https://wa.me/966548589875?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D9%85%D8%BA%D8%B3%D9%84%D8%A9%20RM.STAR%20%D9%81%D8%B1%D8%B9%20%D8%A7%D9%84%D9%82%D8%B1%D9%8A%D9%86%D9%8A%D8%A9',
+    subtitle: `${formatDisplayPhone(contacts.qurayniyyahPhone || '0548589875')} — محادثة فورية`,
+    url: `https://wa.me/${qurayniyyahWhatsapp}?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D9%85%D8%BA%D8%B3%D9%84%D8%A9%20RM.STAR%20%D9%81%D8%B1%D8%B9%20%D8%A7%D9%84%D9%82%D8%B1%D9%8A%D9%86%D9%8A%D8%A9`,
     iconName: 'whatsapp',
-  },
-  {
-    id: 'all-links',
-    title: 'RM.STAR Official LinkTree',
-    subtitle: 'جميع حساباتنا وروابطنا الرسمية',
-    url: '#',
-    iconName: 'globe',
-  },
-];
+  });
 
-export const SERVICES_LIST: ServiceHighlight[] = [
+  // 10. LinkTree / External Master URL
+  if (socials.allLinksUrl && socials.allLinksUrl.trim() !== '' && socials.allLinksUrl !== '#') {
+    links.push({
+      id: 'all-links',
+      title: 'RM.STAR LinkTree | صفحة الروابط الشاملة',
+      subtitle: 'جميع الحسابات وروابط الفروع في مكان واحد',
+      url: socials.allLinksUrl,
+      iconName: 'globe',
+    });
+  }
+
+  return links;
+}
+
+export const SOCIAL_LINKS: SocialLink[] = getDynamicSocialLinks();
+
+export const SERVICES_HIGHLIGHTS: ServiceHighlight[] = [
   {
     id: 'wash',
-    title: 'غسيل ساطع وتفصيلي',
-    desc: 'تنظيف عميق بالرغوة الفعالة وتجفيف فائق العناية',
+    title: 'غسيل واش احترافي',
+    desc: 'رغوة ثلجية، شامبو نانو، حماية وتلميع الكفرات والجنوط',
     icon: 'Sparkles',
   },
   {
-    id: 'polish',
-    title: 'تلميع واعتناء بالهيكل',
-    desc: 'إزالة الخدوش السطحية وإعادة اللمعان الوكالة',
-    icon: 'Shield',
+    id: 'undercarriage',
+    title: 'غسيل بستم وأسفل الهيكل',
+    desc: 'تنظيف هيدروليكي قوي بضغط مرتفع لحماية الشاسيه من الرواسب',
+    icon: 'Droplets',
   },
   {
     id: 'interior',
-    title: 'تنظيف وتعقيم داخلي',
-    desc: 'تنظيف المراتب والفرش بأحدث أجهزة البخار والتعطير',
-    icon: 'Car',
+    title: 'تنظيف وتعقيم المقصورة',
+    desc: 'تنظيف الأرضيات والفرش والطبلون مع تعقيم كامل',
+    icon: 'Shield',
   },
   {
-    id: 'nano',
-    title: 'حماية وعزل مائي',
-    desc: 'طبقات حماية ضد الأتربة والبهتان وأشعة الشمس',
-    icon: 'Zap',
+    id: 'express',
+    title: 'خدمة سريعة 24 ساعة',
+    desc: 'بدون انتظار مع طاقم محترف وجاهز على مدار الساعة',
+    icon: 'Clock',
   },
 ];

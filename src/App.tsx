@@ -30,7 +30,7 @@ export default function App() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
-  // Dynamic Customization (Logo & Offers) synchronized with Firebase
+  // Dynamic Customization (Logo, Contacts, Socials & Offers) synchronized with Firebase
   const [customData, setCustomData] = useState<AppCustomization>(getLocalStoredCustomization());
 
   useEffect(() => {
@@ -67,13 +67,13 @@ export default function App() {
         lang === 'ar' ? "font-['Cairo',sans-serif]" : "font-sans"
       } pb-24`}
     >
-      {/* Animated Electric Blue Glowing Background & Water Bubbles */}
+      {/* Deep Solid Luxury Dark Background */}
       <AnimatedBackground />
 
       {/* Main Container - Optimized for mobile viewports (100% Mobile First) */}
       <main className="relative z-10 w-full max-w-md mx-auto px-3 sm:px-4 py-2 flex flex-col justify-between min-h-screen">
         <div className="space-y-3">
-          {/* Header & Logo with 5-Tap Secret Admin Trigger */}
+          {/* Header & Logo with 100% STEALTH 5-Tap Secret Admin Trigger */}
           <HeaderLogo
             compact={currentTab !== 'home'}
             onGoToBranches={() => handleTabChange('branches')}
@@ -86,9 +86,10 @@ export default function App() {
           {/* PAGE 1: HOME (الرئيسية) */}
           {currentTab === 'home' && (
             <div className="space-y-3 animate-fadeIn">
-              {/* Core Action Buttons */}
+              {/* Core Action Buttons with Dynamic Phone/Social Settings */}
               <ActionButtons
                 lang={lang}
+                customData={customData}
                 onGoToBranches={() => handleTabChange('branches')}
                 onGoToPrices={() => handleTabChange('prices')}
                 onGoToLinks={() => handleTabChange('links')}
@@ -132,11 +133,11 @@ export default function App() {
           {/* PAGE 3: BRANCHES (الفروع والخرائط) */}
           {currentTab === 'branches' && (
             <div className="animate-fadeIn">
-              <BranchesSection lang={lang} />
+              <BranchesSection lang={lang} customData={customData} />
             </div>
           )}
 
-          {/* PAGE 4: SERVICES (الخدمات والتلميع) */}
+          {/* PAGE 4: SERVICES (الخدمات والغسيل) */}
           {currentTab === 'services' && (
             <div className="animate-fadeIn">
               <ServicesPage
@@ -157,13 +158,13 @@ export default function App() {
           {/* PAGE 6: LINKS (الحسابات وروابط التواصل) */}
           {currentTab === 'links' && (
             <div className="animate-fadeIn">
-              <LinksPage />
+              <LinksPage customData={customData} />
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <BrandFooter lang={lang} />
+        {/* Footer with Dynamic Contact Numbers */}
+        <BrandFooter lang={lang} customData={customData} />
       </main>
 
       {/* Modern Bottom Navigation Bar */}
@@ -182,16 +183,18 @@ export default function App() {
         onSave={(newData) => setCustomData(newData)}
       />
 
-      {/* Modals */}
+      {/* Modals with Dynamic Cloud Phone & WhatsApp Numbers */}
       <CallModal
         isOpen={isCallModalOpen}
         onClose={() => setIsCallModalOpen(false)}
         lang={lang}
+        customData={customData}
       />
       <WhatsAppModal
         isOpen={isWhatsAppModalOpen}
         onClose={() => setIsWhatsAppModalOpen(false)}
         lang={lang}
+        customData={customData}
       />
       <ShareModal
         isOpen={isLinksModalOpen}

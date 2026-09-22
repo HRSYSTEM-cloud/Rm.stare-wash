@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { MapPin, PhoneCall, MessageCircle, ExternalLink, Share2, Sparkles, Star, Tag } from 'lucide-react';
 import { Language, translations } from '../data/translations';
+import { AppCustomization, DEFAULT_SOCIALS } from '../data/customization';
 
 interface ActionButtonsProps {
   onScrollToBranches?: () => void;
@@ -12,6 +13,7 @@ interface ActionButtonsProps {
   onOpenWhatsAppModal: () => void;
   onOpenLinksModal: () => void;
   lang: Language;
+  customData?: AppCustomization;
 }
 
 export function ActionButtons({
@@ -24,8 +26,11 @@ export function ActionButtons({
   onOpenWhatsAppModal,
   onOpenLinksModal,
   lang,
+  customData,
 }: ActionButtonsProps) {
   const t = translations[lang];
+
+  const tiktokUrl = customData?.socials?.tiktokUrl || DEFAULT_SOCIALS.tiktokUrl;
 
   const handleBranchesClick = () => {
     if (onGoToBranches) {
@@ -61,92 +66,92 @@ export function ActionButtons({
             </div>
             <div className="text-start">
               <div className="flex items-center gap-2">
-                <span className="text-sm sm:text-base font-black text-white tracking-wide">
-                  {t.btnPrices}
+                <span className="text-base sm:text-lg font-black text-white tracking-wide">
+                  {lang === 'ar' ? 'قائمة الأسعار المعتمدة' : 'Official Price List'}
                 </span>
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-black animate-bounce">
-                  جديد
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-400 text-black shadow-[0_0_10px_#00e5ff] animate-pulse">
+                  {lang === 'ar' ? 'معتمدة' : 'Official'}
                 </span>
               </div>
               <p className="text-xs text-cyan-200/90 font-medium mt-0.5">
-                {t.btnPricesDesc}
+                {lang === 'ar' ? 'أسعار غسيل الربوة والقرينية لجميع الأحجام' : 'Rabwah & Khumrah wash rates'}
               </p>
             </div>
           </div>
-          <span className="text-cyan-300 text-lg font-black group-hover:translate-x-[-3px] transition-transform">
-            {lang === 'ar' ? '←' : '→'}
-          </span>
+          <div className="w-8 h-8 rounded-full bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 group-hover:bg-cyan-400 group-hover:text-black transition-all shrink-0">
+            <span className="text-base font-bold">{lang === 'ar' ? '←' : '→'}</span>
+          </div>
         </div>
       </motion.button>
 
-      {/* 2. Large Branches Button (زر 📍 الفروع البارز) */}
+      {/* 2. Branches Locator Button */}
       <motion.button
-        id="btn-branches-hero"
+        id="btn-branches-locator"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleBranchesClick}
-        className="w-full relative group overflow-hidden rounded-2xl p-[1.5px] focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+        className="w-full relative group overflow-hidden rounded-2xl p-[2px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-[#07090e] transition-all"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-700 rounded-2xl opacity-75 group-hover:opacity-100 blur-[1px] transition duration-300" />
-        <div className="relative flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 bg-[#071122] rounded-[14px] border border-blue-400/40 shadow-[0_0_20px_rgba(0,120,255,0.3)] transition-all">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-500 rounded-2xl opacity-80 group-hover:opacity-100 blur-[2px] transition duration-300" />
+        <div className="relative flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 bg-gradient-to-r from-[#081224] via-[#0d1f3d] to-[#081224] rounded-[14px] border border-blue-400/40 shadow-[0_0_25px_rgba(0,102,255,0.4)] group-hover:shadow-[0_0_35px_rgba(0,102,255,0.6)] transition-all">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-cyan-300 shrink-0">
-              <MapPin className="w-5 h-5 text-cyan-300 stroke-[2.5]" />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white shadow-[0_0_15px_rgba(0,102,255,0.6)] shrink-0 group-hover:scale-105 transition-transform">
+              <MapPin className="w-5 h-5 text-white" />
             </div>
             <div className="text-start">
               <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-black text-white tracking-wide">
+                <span className="text-sm sm:text-base font-black text-white tracking-wide">
                   {t.btnBranches}
                 </span>
-                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-cyan-400 text-black">
-                  24H
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/30 text-cyan-300 border border-cyan-400/40">
+                  {lang === 'ar' ? 'فرعين بجدة' : '2 Branches'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 mt-0.5">
+              <p className="text-xs text-slate-300 font-medium">
                 {t.btnBranchesDesc}
               </p>
             </div>
           </div>
-          <span className="text-blue-300 text-base font-black">
-            {lang === 'ar' ? '←' : '→'}
-          </span>
+          <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 group-hover:bg-cyan-400 group-hover:text-black transition-all shrink-0">
+            <span className="text-sm font-bold">{lang === 'ar' ? '←' : '→'}</span>
+          </div>
         </div>
       </motion.button>
 
-      {/* 3. Call Now + WhatsApp Side by Side */}
+      {/* 3. Direct Contact Row: Call & WhatsApp */}
       <div className="grid grid-cols-2 gap-2.5">
-        {/* Call Now Button */}
+        {/* Direct Call Button */}
         <motion.button
-          id="btn-call-now"
+          id="btn-call-modal"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onOpenCallModal}
           className="relative group overflow-hidden rounded-xl p-[1.5px] focus:outline-none transition-all"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 rounded-xl opacity-75 group-hover:opacity-100 blur-[1px] transition-opacity" />
-          <div className="relative flex flex-col items-center justify-center py-3.5 px-3 bg-[#081124] rounded-[11px] border border-blue-400/40 text-center shadow-[0_0_15px_rgba(0,102,255,0.25)] group-hover:shadow-[0_0_20px_rgba(0,180,255,0.5)] transition-all">
-            <div className="w-9 h-9 rounded-lg bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-cyan-300 mb-1.5 shadow-[0_0_10px_rgba(0,150,255,0.4)]">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl opacity-75 group-hover:opacity-100 blur-[1px] transition-opacity" />
+          <div className="relative flex flex-col items-center justify-center p-3 bg-gradient-to-b from-[#0a1224] to-[#070b16] rounded-[10px] border border-blue-400/40 shadow-[0_0_15px_rgba(0,102,255,0.3)] text-center h-full">
+            <div className="w-9 h-9 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 mb-1.5 shadow-[0_0_10px_rgba(0,102,255,0.4)]">
               <PhoneCall className="w-4 h-4" />
             </div>
             <span className="text-xs sm:text-sm font-black text-white">
               {t.btnCall}
             </span>
-            <span className="text-[10px] text-blue-300/80 font-medium">
+            <span className="text-[10px] text-cyan-300/80 font-medium">
               {t.btnCallDesc}
             </span>
           </div>
         </motion.button>
 
-        {/* WhatsApp Direct Button */}
+        {/* WhatsApp Button */}
         <motion.button
-          id="btn-whatsapp-direct"
+          id="btn-whatsapp-modal"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onOpenWhatsAppModal}
           className="relative group overflow-hidden rounded-xl p-[1.5px] focus:outline-none transition-all"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 rounded-xl opacity-75 group-hover:opacity-100 blur-[1px] transition-opacity" />
-          <div className="relative flex flex-col items-center justify-center py-3.5 px-3 bg-[#06151f] rounded-[11px] border border-emerald-400/40 text-center shadow-[0_0_15px_rgba(16,185,129,0.25)] group-hover:shadow-[0_0_20px_rgba(0,229,255,0.5)] transition-all">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-xl opacity-75 group-hover:opacity-100 blur-[1px] transition-opacity" />
+          <div className="relative flex flex-col items-center justify-center p-3 bg-gradient-to-b from-[#061814] to-[#030d0a] rounded-[10px] border border-emerald-400/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] text-center h-full">
             <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 mb-1.5 shadow-[0_0_10px_rgba(16,185,129,0.4)]">
               <MessageCircle className="w-4 h-4" />
             </div>
@@ -190,12 +195,12 @@ export function ActionButtons({
         </div>
       </motion.button>
 
-      {/* 5. Official TikTok Account Button */}
+      {/* 5. Official TikTok Account Button (Dynamic URL from Admin) */}
       <motion.a
         id="btn-tiktok"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        href="https://www.tiktok.com/@rm.star.carwash"
+        href={tiktokUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="block w-full relative group overflow-hidden rounded-xl p-[1.5px] focus:outline-none transition-all"

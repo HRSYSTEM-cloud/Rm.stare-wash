@@ -21,7 +21,7 @@ export interface SocialLink {
   title: string;
   subtitle?: string;
   url: string;
-  iconName: 'tiktok' | 'whatsapp' | 'phone' | 'instagram' | 'snapchat' | 'share' | 'globe';
+  iconName: 'tiktok' | 'whatsapp' | 'phone' | 'instagram' | 'snapchat' | 'twitter' | 'youtube' | 'facebook' | 'telegram' | 'share' | 'globe';
   highlight?: boolean;
 }
 

@@ -1,11 +1,13 @@
-import { SERVICES_LIST } from '../data/branches';
-import { Sparkles, Shield, Car, Zap } from 'lucide-react';
+import { SERVICES_HIGHLIGHTS } from '../data/branches';
+import { Sparkles, Shield, Car, Zap, Droplets, Clock } from 'lucide-react';
 
-const iconMap = {
+const iconMap: Record<string, any> = {
   Sparkles: Sparkles,
   Shield: Shield,
   Car: Car,
   Zap: Zap,
+  Droplets: Droplets,
+  Clock: Clock,
 };
 
 export function ServicesBar() {
@@ -15,7 +17,7 @@ export function ServicesBar() {
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>خدمات العناية والتلميع</span>
+            <span>خدمات الغسيل المتكاملة</span>
           </span>
           <span className="text-[10px] text-blue-300/80 font-semibold">
             أعلى معايير الجودة
@@ -23,8 +25,8 @@ export function ServicesBar() {
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
-          {SERVICES_LIST.map((srv) => {
-            const IconComp = iconMap[srv.icon as keyof typeof iconMap] || Sparkles;
+          {SERVICES_HIGHLIGHTS.map((srv) => {
+            const IconComp = iconMap[srv.icon] || Sparkles;
             return (
               <div
                 key={srv.id}

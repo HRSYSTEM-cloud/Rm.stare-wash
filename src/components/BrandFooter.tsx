@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react';
 import { ArrowUp, Clock } from 'lucide-react';
 import { Language, translations } from '../data/translations';
+import { AppCustomization } from '../data/customization';
+import { getDynamicBranches } from '../data/branches';
 
 interface BrandFooterProps {
   lang: Language;
+  customData?: AppCustomization;
 }
 
-export function BrandFooter({ lang }: BrandFooterProps) {
+export function BrandFooter({ lang, customData }: BrandFooterProps) {
   const [jeddahTime, setJeddahTime] = useState('');
   const t = translations[lang];
+  const branches = getDynamicBranches(customData);
+  const rabwah = branches.find((b) => b.id === 'al-rabwah') || branches[0];
+  const qurayniyyah = branches.find((b) => b.id === 'al-qurayniyyah') || branches[1];
 
   useEffect(() => {
     const updateTime = () => {
@@ -76,13 +82,13 @@ export function BrandFooter({ lang }: BrandFooterProps) {
         </div>
       )}
 
-      {/* Branches Quick Directory */}
+      {/* Branches Quick Directory with Dynamic Numbers */}
       <div className="text-[11px] text-slate-400 leading-relaxed border-t border-blue-900/20 pt-2.5">
         <p>
-          <strong className="text-slate-200">{lang === 'ar' ? 'فرع الربوة:' : 'Al Rabwah:'}</strong> {lang === 'ar' ? 'طريق الملك فهد (الستين) مع شارع يحيى المعلمي' : 'King Fahd Rd. (60th) x Yahya Al-Moalimi'} &bull; 056 336 4380
+          <strong className="text-slate-200">{lang === 'ar' ? 'فرع الربوة:' : 'Al Rabwah:'}</strong> {lang === 'ar' ? 'طريق الملك فهد (الستين) مع شارع يحيى المعلمي' : 'King Fahd Rd. (60th) x Yahya Al-Moalimi'} &bull; {rabwah?.displayPhone}
         </p>
         <p className="mt-1">
-          <strong className="text-slate-200">{lang === 'ar' ? 'فرع القرينية:' : 'Al Qurayniyyah:'}</strong> {lang === 'ar' ? 'شارع الشريف بركات ابن محمد' : 'Al Sharif Barakat Ibn Mohammad St.'} &bull; 054 858 9875
+          <strong className="text-slate-200">{lang === 'ar' ? 'فرع القرينية:' : 'Al Qurayniyyah:'}</strong> {lang === 'ar' ? 'شارع الشريف بركات ابن محمد' : 'Al Sharif Barakat Ibn Mohammad St.'} &bull; {qurayniyyah?.displayPhone}
         </p>
       </div>
 

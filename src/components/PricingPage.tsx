@@ -60,7 +60,7 @@ export function PricingPage({ lang }: PricingPageProps) {
           <span>{lang === 'ar' ? 'قائمة الأسعار الرسمية' : 'Official Price List'}</span>
         </div>
         <h2 className="text-xl font-black text-white">
-          {lang === 'ar' ? 'أسعار خدمات الغسيل والتنظيف' : 'Car Wash & Detailing Rates'}
+          {lang === 'ar' ? 'أسعار خدمات الغسيل والتنظيف' : 'Car Wash Rates & Services'}
         </h2>
         <p className="text-xs text-slate-300">
           {lang === 'ar' ? activePricing.noteAr : activePricing.noteEn}

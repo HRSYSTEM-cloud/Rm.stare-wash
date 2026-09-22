@@ -13,6 +13,17 @@ export interface AppOffer {
   code?: string;
 }
 
+export interface SocialMediaAccounts {
+  tiktokUrl?: string;
+  snapchatUrl?: string;
+  instagramUrl?: string;
+  xTwitterUrl?: string;
+  youtubeUrl?: string;
+  facebookUrl?: string;
+  telegramUrl?: string;
+  allLinksUrl?: string; // LinkTree or master page
+}
+
 export interface AppCustomization {
   logoUrl?: string; // custom uploaded or external image url
   heroTitleAr?: string;
@@ -20,9 +31,19 @@ export interface AppCustomization {
   heroSubtitleAr?: string;
   heroSubtitleEn?: string;
   offers: AppOffer[];
+  // Dynamic Contact & Links
+  contacts?: {
+    rabwahPhone?: string;
+    rabwahWhatsapp?: string;
+    rabwahMaps?: string;
+    qurayniyyahPhone?: string;
+    qurayniyyahWhatsapp?: string;
+    qurayniyyahMaps?: string;
+  };
+  socials?: SocialMediaAccounts;
 }
 
-const STORAGE_KEY = 'rm_star_custom_data_v1';
+const STORAGE_KEY = 'rm_star_custom_data_v3';
 
 export const DEFAULT_OFFERS: AppOffer[] = [
   {
@@ -48,12 +69,38 @@ export const DEFAULT_OFFERS: AppOffer[] = [
   },
 ];
 
+export const DEFAULT_CONTACTS = {
+  rabwahPhone: '0563364380',
+  rabwahWhatsapp: '966563364380',
+  rabwahMaps: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
+  qurayniyyahPhone: '0548589875',
+  qurayniyyahWhatsapp: '966548589875',
+  qurayniyyahMaps: 'https://www.google.com/maps/search/?api=1&query=21.3655,39.2612+(مغسلة+آر+إم+ستار+فرع+القرينية+جدة)',
+};
+
+export const DEFAULT_SOCIALS: SocialMediaAccounts = {
+  tiktokUrl: 'https://www.tiktok.com/@rm.star.carwash',
+  snapchatUrl: '',
+  instagramUrl: '',
+  xTwitterUrl: '',
+  youtubeUrl: '',
+  facebookUrl: '',
+  telegramUrl: '',
+  allLinksUrl: '',
+};
+
 // Fallback / Initial Local Cache
 export function getLocalStoredCustomization(): AppCustomization {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return {
+        logoUrl: parsed.logoUrl || '',
+        offers: parsed.offers || DEFAULT_OFFERS,
+        contacts: { ...DEFAULT_CONTACTS, ...(parsed.contacts || {}) },
+        socials: { ...DEFAULT_SOCIALS, ...(parsed.socials || {}) },
+      };
     }
   } catch (e) {
     console.error('Failed to load local custom data', e);
@@ -61,6 +108,8 @@ export function getLocalStoredCustomization(): AppCustomization {
   return {
     logoUrl: '',
     offers: DEFAULT_OFFERS,
+    contacts: DEFAULT_CONTACTS,
+    socials: DEFAULT_SOCIALS,
   };
 }
 
@@ -79,8 +128,14 @@ export async function fetchCloudCustomization(): Promise<AppCustomization> {
     const snap = await getDoc(docRef);
     if (snap.exists()) {
       const data = snap.data() as AppCustomization;
-      saveLocalStoredCustomization(data);
-      return data;
+      const merged: AppCustomization = {
+        logoUrl: data.logoUrl || '',
+        offers: data.offers || DEFAULT_OFFERS,
+        contacts: { ...DEFAULT_CONTACTS, ...(data.contacts || {}) },
+        socials: { ...DEFAULT_SOCIALS, ...(data.socials || {}) },
+      };
+      saveLocalStoredCustomization(merged);
+      return merged;
     }
   } catch (err) {
     console.warn('Could not fetch from Firebase Firestore, using cached/default:', err);
@@ -105,7 +160,7 @@ export async function saveCloudCustomization(data: AppCustomization): Promise<vo
   }
 }
 
-// Real-time listener for Firestore changes across devices and Vercel visitors
+// Real-time listener for Firestore changes across devices and visitors
 export function subscribeToCustomization(callback: (data: AppCustomization) => void) {
   try {
     const docRef = doc(db, 'settings', 'customization');
@@ -114,8 +169,14 @@ export function subscribeToCustomization(callback: (data: AppCustomization) => v
       (snap) => {
         if (snap.exists()) {
           const data = snap.data() as AppCustomization;
-          saveLocalStoredCustomization(data);
-          callback(data);
+          const merged: AppCustomization = {
+            logoUrl: data.logoUrl || '',
+            offers: data.offers || DEFAULT_OFFERS,
+            contacts: { ...DEFAULT_CONTACTS, ...(data.contacts || {}) },
+            socials: { ...DEFAULT_SOCIALS, ...(data.socials || {}) },
+          };
+          saveLocalStoredCustomization(merged);
+          callback(merged);
         }
       },
       (err) => {

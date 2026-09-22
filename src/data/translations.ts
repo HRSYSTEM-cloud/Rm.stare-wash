@@ -7,7 +7,7 @@ export const translations = {
     brandSubtitle: 'STAR CAR WASH',
     tagline: 'مغسلة سيارات متكاملة • جدة',
     open247: '24/7 مفتوح',
-    heroDesc: 'خدمة غسيل وتلميع سيارات احترافية على مدار 24 ساعة بأحدث التقنيات والمواد الأصلية في مدينة جدة',
+    heroDesc: 'خدمة غسيل سيارات احترافية على مدار 24 ساعة بأحدث التقنيات والشامبو الأصلي في مدينة جدة',
     servingYou: 'نخدمكم في فرعين بجدة على مدار 24 ساعة',
     
     // Bottom Nav Tabs
@@ -64,12 +64,12 @@ export const translations = {
     copiedText: 'تم نسخ العنوان!',
 
     // Services Section
-    servicesTitle: 'خدمات RM.STAR للعناية بالسيارات',
-    servicesSubtitle: 'أحدث معدات الغسيل ومواد التلميع الأمريكية والأوروبية',
+    servicesTitle: 'خدمات RM.STAR لغسيل السيارات',
+    servicesSubtitle: 'أحدث معدات الغسيل والرغوة والشامبو المعتمد',
     serviceWashTitle: 'غسيل واش احترافي متكامل',
-    serviceWashDesc: 'غسيل خارجي برغوة ثلجية كثيفة مع تنظيف وتلميع الجنوط وإزالة الأوساخ المستعصية دون خدش الطلاء.',
-    servicePolishTitle: 'تلميع ساطع وإزالة الخدوش',
-    servicePolishDesc: 'استعادة بريق وكالة الدهان وحماية عميقة تعيد لسيارتك لمعانها الأصلي مع إبراز درجات اللون.',
+    serviceWashDesc: 'غسيل خارجي برغوة ثلجية كثيفة مع تنظيف وتلميع الجنوط وإزالة الأوساخ المستعصية بأمان تام.',
+    servicePolishTitle: 'غسيل بستم وأسفل الهيكل',
+    servicePolishDesc: 'تنظيف قوي بضغط مائي مرتفع لأسفل السيارة يزيل الطين والأملاح والرواسب لحماية الشاسيه.',
     serviceInteriorTitle: 'تنظيف وتعقيم المقصورة الداخلية',
     serviceInteriorDesc: 'عناية تفصيلية بالمقاعد، الطبلون، الأبواب، والأرضيات مع تعقيم كامل يزيل الروائح والجراثيم.',
     serviceExpressTitle: 'خدمة سريعة 24/7 بدون انتظار',
@@ -101,7 +101,7 @@ export const translations = {
     brandSubtitle: 'STAR CAR WASH',
     tagline: 'Premium Auto Wash & Detailing • Jeddah',
     open247: '24/7 OPEN',
-    heroDesc: 'Professional 24-hour car washing and detailing using advanced equipment and genuine car care formulas in Jeddah.',
+    heroDesc: 'Professional 24-hour car washing using advanced equipment and genuine car care formulas in Jeddah.',
     servingYou: 'Serving you across 2 prime locations in Jeddah, 24/7',
 
     // Bottom Nav Tabs
@@ -158,12 +158,12 @@ export const translations = {
     copiedText: 'Address Copied!',
 
     // Services Section
-    servicesTitle: 'RM.STAR Auto Care Services',
-    servicesSubtitle: 'Latest washing gear & premium US & European detailing compounds',
+    servicesTitle: 'RM.STAR Auto Wash Services',
+    servicesSubtitle: 'Latest washing gear & premium genuine washing shampoos',
     serviceWashTitle: 'Full Exterior Snow Foam Wash',
-    serviceWashDesc: 'Gentle thick snow foam wash, rim detailing, tire shine, and dirt elimination without swirl marks.',
-    servicePolishTitle: 'Mirror Finish Polish & Protection',
-    servicePolishDesc: 'Restore factory showroom gloss, eliminate light scratches, and add a deep hydrophobic protective coat.',
+    serviceWashDesc: 'Gentle thick snow foam wash, rim detailing, tire shine, and dirt elimination without scratching paint.',
+    servicePolishTitle: 'Undercarriage & Chassis Wash',
+    servicePolishDesc: 'High-pressure underbody cleaning removing mud, grime, and road salt to protect the vehicle chassis.',
     serviceInteriorTitle: 'Interior Detailing & Sanitization',
     serviceInteriorDesc: 'Deep seat, dashboard, and carpet care with full interior ozone sanitization removing odors and allergens.',
     serviceExpressTitle: 'Express 24/7 Express Lane',

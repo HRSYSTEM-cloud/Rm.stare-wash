@@ -1,4 +1,4 @@
-import { Sparkles, Shield, Car, Zap, CheckCircle2, Clock, PhoneCall, MessageCircle } from 'lucide-react';
+import { Sparkles, Shield, Car, Zap, CheckCircle2, PhoneCall, MessageCircle, Droplets } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 
 interface ServicesPageProps {
@@ -22,21 +22,23 @@ export function ServicesPage({ onOpenCallModal, onOpenWhatsAppModal, lang }: Ser
         : ['Nano snow shampoo', 'Deep rim & tire gloss', 'Microfiber scratchless dry'],
     },
     {
-      id: 'polish',
-      title: t.servicePolishTitle,
-      desc: t.servicePolishDesc,
-      icon: Sparkles,
-      tag: lang === 'ar' ? 'جودة فائقة' : 'Premium Finish',
+      id: 'undercarriage',
+      title: lang === 'ar' ? 'غسيل بستم وأسفل الهيكل' : 'Undercarriage & Chassis Wash',
+      desc: lang === 'ar'
+        ? 'تنظيف هيدروليكي قوي لأسفل السيارة يزيل الأتربة، الرواسب والأملاح المتراكمة لحماية الشاسيه.'
+        : 'High-pressure underbody cleaning removing mud, grime, and road salt to protect the chassis.',
+      icon: Droplets,
+      tag: lang === 'ar' ? 'عناية كاملة' : 'Chassis Care',
       features: lang === 'ar'
-        ? ['إزالة بهتان اللون', 'طبقة حماية ضد الأشعة', 'تلميع الشمعات والزجاج']
-        : ['Swirl & oxidation removal', 'UV paint sealant', 'Headlights & glass polish'],
+        ? ['ضغط مياه عالي لإزالة الطين', 'حماية بطن السيارة من الصدأ', 'تنظيف الشاسيه والمقصات']
+        : ['High pressure mud removal', 'Rust prevention wash', 'Chassis & suspension clean'],
     },
     {
       id: 'interior',
       title: t.serviceInteriorTitle,
       desc: t.serviceInteriorDesc,
       icon: Shield,
-      tag: lang === 'ar' ? 'عناية فائقة' : 'Deep Sanitizing',
+      tag: lang === 'ar' ? 'نظافة فائقة' : 'Deep Sanitizing',
       features: lang === 'ar'
         ? ['تنظيف المقاعد والأرضيات', 'ترطيب الجلد والبلاستيك', 'تعقيم هواء المقصورة']
         : ['Deep upholstery clean', 'Leather & vinyl conditioning', 'Cabin air sanitization'],
@@ -62,7 +64,7 @@ export function ServicesPage({ onOpenCallModal, onOpenWhatsAppModal, lang }: Ser
           <span>{t.servicesTitle}</span>
         </div>
         <h2 className="text-xl font-black text-white">
-          {lang === 'ar' ? 'عناية فائقة تليق بسيارتك' : 'Pristine Car Care & Detailing'}
+          {lang === 'ar' ? 'خدمات غسيل وعناية متكاملة' : 'Pristine Car Wash & Care'}
         </h2>
         <p className="text-xs text-slate-300">
           {t.servicesSubtitle}
