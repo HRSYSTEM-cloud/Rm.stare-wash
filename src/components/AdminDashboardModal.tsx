@@ -13,7 +13,7 @@ import {
   Eye,
   AlertCircle
 } from 'lucide-react';
-import { AppCustomization, AppOffer, DEFAULT_OFFERS, saveStoredCustomization } from '../data/customization';
+import { AppCustomization, AppOffer, DEFAULT_OFFERS, saveCloudCustomization } from '../data/customization';
 import { Language } from '../data/translations';
 
 interface AdminDashboardModalProps {
@@ -75,21 +75,25 @@ export function AdminDashboardModal({
     reader.readAsDataURL(file);
   };
 
-  const handleSaveAll = () => {
+  const handleSaveAll = async () => {
     const updated: AppCustomization = {
       ...currentData,
       logoUrl,
       offers,
     };
-    saveStoredCustomization(updated);
-    onSave(updated);
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-    }, 2500);
+    try {
+      await saveCloudCustomization(updated);
+      onSave(updated);
+      setSavedSuccess(true);
+      setTimeout(() => {
+        setSavedSuccess(false);
+      }, 2500);
+    } catch (e) {
+      alert(lang === 'ar' ? 'حدث خطأ أثناء الحفظ في السحاب' : 'Failed to save to cloud');
+    }
   };
 
-  const handleResetToDefault = () => {
+  const handleResetToDefault = async () => {
     if (confirm(lang === 'ar' ? 'هل أنت متأكد من استعادة الشعار والعروض الافتراضية؟' : 'Reset logo and offers to default?')) {
       const resetData: AppCustomization = {
         logoUrl: '',
@@ -97,8 +101,12 @@ export function AdminDashboardModal({
       };
       setLogoUrl('');
       setOffers(DEFAULT_OFFERS);
-      saveStoredCustomization(resetData);
-      onSave(resetData);
+      try {
+        await saveCloudCustomization(resetData);
+        onSave(resetData);
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 

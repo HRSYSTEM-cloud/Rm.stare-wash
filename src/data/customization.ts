@@ -1,3 +1,6 @@
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+
 export interface AppOffer {
   id: string;
   titleAr: string;
@@ -45,14 +48,15 @@ export const DEFAULT_OFFERS: AppOffer[] = [
   },
 ];
 
-export function getStoredCustomization(): AppCustomization {
+// Fallback / Initial Local Cache
+export function getLocalStoredCustomization(): AppCustomization {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       return JSON.parse(raw);
     }
   } catch (e) {
-    console.error('Failed to load custom data', e);
+    console.error('Failed to load local custom data', e);
   }
   return {
     logoUrl: '',
@@ -60,10 +64,66 @@ export function getStoredCustomization(): AppCustomization {
   };
 }
 
-export function saveStoredCustomization(data: AppCustomization): void {
+export function saveLocalStoredCustomization(data: AppCustomization): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error('Failed to save custom data', e);
+    console.error('Failed to save local custom data', e);
+  }
+}
+
+// Firebase Cloud Persistence Sync
+export async function fetchCloudCustomization(): Promise<AppCustomization> {
+  try {
+    const docRef = doc(db, 'settings', 'customization');
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const data = snap.data() as AppCustomization;
+      saveLocalStoredCustomization(data);
+      return data;
+    }
+  } catch (err) {
+    console.warn('Could not fetch from Firebase Firestore, using cached/default:', err);
+  }
+  return getLocalStoredCustomization();
+}
+
+export async function saveCloudCustomization(data: AppCustomization): Promise<void> {
+  // Always update local cache instantly
+  saveLocalStoredCustomization(data);
+
+  // Sync to Firebase Cloud Firestore
+  try {
+    const docRef = doc(db, 'settings', 'customization');
+    await setDoc(docRef, {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch (err) {
+    console.error('Failed to save to Firebase Firestore:', err);
+    throw err;
+  }
+}
+
+// Real-time listener for Firestore changes across devices and Vercel visitors
+export function subscribeToCustomization(callback: (data: AppCustomization) => void) {
+  try {
+    const docRef = doc(db, 'settings', 'customization');
+    return onSnapshot(
+      docRef,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data() as AppCustomization;
+          saveLocalStoredCustomization(data);
+          callback(data);
+        }
+      },
+      (err) => {
+        console.warn('Realtime subscription fallback:', err);
+      }
+    );
+  } catch (err) {
+    console.warn('Could not attach Firestore onSnapshot:', err);
+    return () => {};
   }
 }

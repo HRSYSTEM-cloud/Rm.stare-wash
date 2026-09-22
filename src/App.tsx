@@ -15,7 +15,12 @@ import { ShareModal } from './components/ShareModal';
 import { OffersSection } from './components/OffersSection';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { Language, translations } from './data/translations';
-import { AppCustomization, getStoredCustomization } from './data/customization';
+import {
+  AppCustomization,
+  getLocalStoredCustomization,
+  fetchCloudCustomization,
+  subscribeToCustomization,
+} from './data/customization';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<PageTab>('home');
@@ -25,11 +30,23 @@ export default function App() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
-  // Dynamic Customization (Logo & Offers)
-  const [customData, setCustomData] = useState<AppCustomization>(getStoredCustomization());
+  // Dynamic Customization (Logo & Offers) synchronized with Firebase
+  const [customData, setCustomData] = useState<AppCustomization>(getLocalStoredCustomization());
 
   useEffect(() => {
-    setCustomData(getStoredCustomization());
+    // 1. Initial fetch from Firestore
+    fetchCloudCustomization().then((data) => {
+      if (data) setCustomData(data);
+    });
+
+    // 2. Realtime listener across all devices and visitors
+    const unsubscribe = subscribeToCustomization((updatedData) => {
+      setCustomData(updatedData);
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const t = translations[lang];

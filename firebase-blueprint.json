@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "customization": {
+      "title": "Customization",
+      "description": "App settings including official logo and promotional offers",
+      "type": "object",
+      "properties": {
+        "logoUrl": {
+          "type": "string",
+          "description": "Custom or uploaded logo URL / base64"
+        },
+        "offers": {
+          "type": "array",
+          "description": "List of active promotions and discounts"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["offers"]
+    }
+  },
+  "firestore": {
+    "/settings/customization": {
+      "schema": "customization",
+      "description": "Global customization document containing logo and promo offers"
+    }
+  }
+}
