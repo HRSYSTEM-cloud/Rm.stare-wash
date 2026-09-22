@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Clock, MapPin, ShieldCheck, Languages } from 'lucide-react';
 import { Language, translations } from '../data/translations';
+import officialLogo from '../assets/images/rm_star_official_logo_1790025610509.jpg';
 
 interface HeaderLogoProps {
   onScrollToBranches?: () => void;
@@ -35,7 +36,7 @@ export function HeaderLogo({
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-xl bg-black border border-cyan-400/50 p-0.5 overflow-hidden shadow-[0_0_10px_rgba(0,180,255,0.4)] shrink-0">
             <img
-              src="/src/assets/images/rm_star_official_logo_1790025610509.jpg"
+              src={officialLogo}
               alt="RM.STAR"
               referrerPolicy="no-referrer"
               className="w-full h-full object-contain"
@@ -107,25 +108,19 @@ export function HeaderLogo({
           <div className="w-full h-full rounded-[14px] sm:rounded-[22px] bg-black overflow-hidden flex items-center justify-center relative border border-blue-400/40">
             {/* The Official RM.STAR Logo */}
             <img
-              src="/src/assets/images/rm_star_official_logo_1790025610509.jpg"
+              src={officialLogo}
               alt="RM.STAR STAR CAR WASH Logo"
               referrerPolicy="no-referrer"
               onLoad={() => setImageLoaded(true)}
-              className={`w-full h-full object-contain p-1 sm:p-2 transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              onError={(e) => {
+                // Fallback to static public logo if bundler hash fails
+                const target = e.currentTarget;
+                if (target.src !== `${window.location.origin}/logo.jpg`) {
+                  target.src = '/logo.jpg';
+                }
+              }}
+              className="w-full h-full object-contain p-1 sm:p-2"
             />
-
-            {/* Fallback Vector Emblem if image is loading */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-3 text-center">
-                <div className="text-cyan-400 font-extrabold text-2xl tracking-tighter drop-shadow-[0_0_12px_rgba(0,210,255,0.8)]">
-                  RM.STAR
-                </div>
-                <div className="text-[11px] text-blue-300 font-semibold tracking-widest uppercase mt-1">
-                  STAR CAR WASH
-                </div>
-                <div className="w-10 h-[2px] bg-blue-500 mt-2 shadow-[0_0_8px_#00aaff]" />
-              </div>
-            )}
           </div>
         </div>
 
