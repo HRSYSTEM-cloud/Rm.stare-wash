@@ -48,6 +48,8 @@ export interface AppCustomization {
   socials?: SocialMediaAccounts;
   // Dynamic Branch Pricing Data
   pricing?: Record<string, BranchPricing>;
+  // Real Google Reviews Integration via Elfsight (Widget ID or App Class)
+  elfsightWidgetId?: string;
 }
 
 const STORAGE_KEY = 'rm_star_custom_data_v5';
@@ -99,6 +101,8 @@ export const DEFAULT_SOCIALS: SocialMediaAccounts = {
 };
 
 // Fallback / Initial Local Cache
+export const DEFAULT_ELFSIGHT_WIDGET_ID = '6a74526d-7ee8-4500-9bc9-1b2a0569bb43';
+
 export function getLocalStoredCustomization(): AppCustomization {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -110,6 +114,7 @@ export function getLocalStoredCustomization(): AppCustomization {
         contacts: { ...DEFAULT_CONTACTS, ...(parsed.contacts || {}) },
         socials: { ...DEFAULT_SOCIALS, ...(parsed.socials || {}) },
         pricing: parsed.pricing || DEFAULT_PRICING_DATA,
+        elfsightWidgetId: parsed.elfsightWidgetId !== undefined ? parsed.elfsightWidgetId : DEFAULT_ELFSIGHT_WIDGET_ID,
       };
     }
   } catch (e) {
@@ -121,6 +126,7 @@ export function getLocalStoredCustomization(): AppCustomization {
     contacts: DEFAULT_CONTACTS,
     socials: DEFAULT_SOCIALS,
     pricing: DEFAULT_PRICING_DATA,
+    elfsightWidgetId: DEFAULT_ELFSIGHT_WIDGET_ID,
   };
 }
 
@@ -145,6 +151,7 @@ export async function fetchCloudCustomization(): Promise<AppCustomization> {
         contacts: { ...DEFAULT_CONTACTS, ...(data.contacts || {}) },
         socials: { ...DEFAULT_SOCIALS, ...(data.socials || {}) },
         pricing: data.pricing || DEFAULT_PRICING_DATA,
+        elfsightWidgetId: data.elfsightWidgetId !== undefined ? data.elfsightWidgetId : DEFAULT_ELFSIGHT_WIDGET_ID,
       };
       saveLocalStoredCustomization(merged);
       return merged;
@@ -184,6 +191,7 @@ export function subscribeToCustomization(callback: (data: AppCustomization) => v
             contacts: { ...DEFAULT_CONTACTS, ...(data.contacts || {}) },
             socials: { ...DEFAULT_SOCIALS, ...(data.socials || {}) },
             pricing: data.pricing || DEFAULT_PRICING_DATA,
+            elfsightWidgetId: data.elfsightWidgetId !== undefined ? data.elfsightWidgetId : DEFAULT_ELFSIGHT_WIDGET_ID,
           };
           saveLocalStoredCustomization(merged);
           callback(merged);

@@ -14,3 +14,40 @@
 .animate-fadeIn {
   animation: fadeIn 0.28s ease-out forwards;
 }
+
+/* Elfsight mobile optimization */
+[class*="elfsight-app-"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+[class*="elfsight-app-"] iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Hide Elfsight Free Plan Watermark Link & Badge */
+a[href*="elfsight.com"],
+a[href*="free-widget"],
+a[href*="utm_campaign=free-widget"],
+[class*="elfsight"] a[href*="elfsight.com"],
+[class*="elfsight-app-"] a[href*="elfsight.com"],
+[class*="elfsight-app-"] [class*="badge" i],
+[class*="elfsight-app-"] [class*="eapps-link" i],
+[class*="elfsight-app-"] > a:last-child {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  max-height: 0 !important;
+  max-width: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  overflow: hidden !important;
+}

@@ -151,7 +151,11 @@ export default function App() {
           {/* PAGE 5: GOOGLE REVIEWS (تقييمات قوقل) */}
           {currentTab === 'reviews' && (
             <div className="animate-fadeIn">
-              <GoogleReviewsPage lang={lang} customData={customData} />
+              <GoogleReviewsPage
+                lang={lang}
+                customData={customData}
+                onOpenAdmin={() => setIsAdminModalOpen(true)}
+              />
             </div>
           )}
 

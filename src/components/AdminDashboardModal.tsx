@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Lock,
@@ -25,6 +25,7 @@ import {
   DEFAULT_OFFERS,
   DEFAULT_CONTACTS,
   DEFAULT_SOCIALS,
+  DEFAULT_ELFSIGHT_WIDGET_ID,
   SocialMediaAccounts,
   saveCloudCustomization,
 } from '../data/customization';
@@ -88,8 +89,40 @@ export function AdminDashboardModal({
     allLinksUrl: currentData.socials?.allLinksUrl ?? '',
   });
 
+  const [elfsightWidgetId, setElfsightWidgetId] = useState<string>(
+    currentData.elfsightWidgetId !== undefined ? currentData.elfsightWidgetId : DEFAULT_ELFSIGHT_WIDGET_ID
+  );
+
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Synchronize modal state with currentData whenever modal opens or currentData updates
+  useEffect(() => {
+    if (isOpen) {
+      setLogoUrl(currentData.logoUrl || '');
+      setOffers(currentData.offers || DEFAULT_OFFERS);
+      setRabwahPhone(currentData.contacts?.rabwahPhone || DEFAULT_CONTACTS.rabwahPhone);
+      setRabwahWhatsapp(currentData.contacts?.rabwahWhatsapp || DEFAULT_CONTACTS.rabwahWhatsapp);
+      setRabwahMaps(currentData.contacts?.rabwahMaps || DEFAULT_CONTACTS.rabwahMaps);
+      setRabwahReviewUrl(currentData.contacts?.rabwahReviewUrl || DEFAULT_CONTACTS.rabwahReviewUrl || DEFAULT_CONTACTS.rabwahMaps);
+      setQurayniyyahPhone(currentData.contacts?.qurayniyyahPhone || DEFAULT_CONTACTS.qurayniyyahPhone);
+      setQurayniyyahWhatsapp(currentData.contacts?.qurayniyyahWhatsapp || DEFAULT_CONTACTS.qurayniyyahWhatsapp);
+      setQurayniyyahMaps(currentData.contacts?.qurayniyyahMaps || DEFAULT_CONTACTS.qurayniyyahMaps);
+      setQurayniyyahReviewUrl(currentData.contacts?.qurayniyyahReviewUrl || DEFAULT_CONTACTS.qurayniyyahReviewUrl || DEFAULT_CONTACTS.qurayniyyahMaps);
+      setPricingState(currentData.pricing || DEFAULT_PRICING_DATA);
+      setElfsightWidgetId(currentData.elfsightWidgetId !== undefined ? currentData.elfsightWidgetId : DEFAULT_ELFSIGHT_WIDGET_ID);
+      setSocials({
+        tiktokUrl: currentData.socials?.tiktokUrl ?? DEFAULT_SOCIALS.tiktokUrl,
+        snapchatUrl: currentData.socials?.snapchatUrl ?? '',
+        instagramUrl: currentData.socials?.instagramUrl ?? '',
+        xTwitterUrl: currentData.socials?.xTwitterUrl ?? '',
+        youtubeUrl: currentData.socials?.youtubeUrl ?? '',
+        facebookUrl: currentData.socials?.facebookUrl ?? '',
+        telegramUrl: currentData.socials?.telegramUrl ?? '',
+        allLinksUrl: currentData.socials?.allLinksUrl ?? '',
+      });
+    }
+  }, [isOpen, currentData]);
 
   if (!isOpen) return null;
 
@@ -108,17 +141,49 @@ export function AdminDashboardModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 3 * 1024 * 1024) {
-      alert(lang === 'ar' ? 'حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 3 ميجابايت' : 'Image too large. Please select an image under 3MB.');
+    if (file.size > 5 * 1024 * 1024) {
+      alert(lang === 'ar' ? 'حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 5 ميجابايت' : 'Image too large. Please select an image under 5MB.');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      if (base64) {
-        setLogoUrl(base64);
-      }
+      const src = event.target?.result as string;
+      if (!src) return;
+
+      // Optimize & scale down if needed so it saves reliably in Firestore & localStorage
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.88);
+          setLogoUrl(compressed);
+        } else {
+          setLogoUrl(src);
+        }
+      };
+      img.onerror = () => {
+        setLogoUrl(src);
+      };
+      img.src = src;
     };
     reader.readAsDataURL(file);
   };
@@ -177,6 +242,7 @@ export function AdminDashboardModal({
       },
       socials,
       pricing: pricingState,
+      elfsightWidgetId: elfsightWidgetId.trim(),
     };
     try {
       await saveCloudCustomization(updated);
@@ -549,16 +615,65 @@ export function AdminDashboardModal({
               {/* 2. GOOGLE REVIEWS TAB */}
               {activeTab === 'reviews' && (
                 <div className="space-y-3.5 animate-fadeIn">
-                  <div className="p-3.5 rounded-xl bg-[#09152b] border border-amber-500/40 space-y-3 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
-                    <div className="flex items-center gap-2 text-amber-300 font-bold text-xs pb-1 border-b border-amber-500/20">
-                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                      <span>{lang === 'ar' ? 'روابط تقييمات قوقل ماب (Google Reviews Links)' : 'Google Maps Review URLs'}</span>
+                  {/* Real Google Reviews Feed via Elfsight */}
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0c1830] to-[#070f1f] border border-cyan-500/40 space-y-3 shadow-[0_0_20px_rgba(0,210,255,0.15)]">
+                    <div className="flex items-center justify-between pb-2 border-b border-cyan-500/20">
+                      <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span>{lang === 'ar' ? 'ربط تعليقات Google الحقيقية (Elfsight Widget)' : 'Real Google Reviews (Elfsight Widget)'}</span>
+                      </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                        elfsightWidgetId
+                          ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40'
+                          : 'bg-slate-800 text-slate-400 border-slate-700'
+                      }`}>
+                        {elfsightWidgetId ? (lang === 'ar' ? 'مربوط' : 'Connected') : (lang === 'ar' ? 'غير مضاف بعد' : 'Not Set')}
+                      </span>
                     </div>
 
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {lang === 'ar'
-                        ? 'يمكنك هنا وضع رابط تقييم قوقل المباشر لكل فرع، أو رابط صفحة التقييم المختصرة (Google Review Shortlink) ليوجه العميل مباشرة إلى نافذة كتابة التقييم والـ 5 نجوم.'
-                        : 'Enter the direct Google review link for each branch to take customers straight to the review dialog.'}
+                        ? 'بعد إنشاء حسابك في Elfsight واختيار Google Reviews Widget لمغسلتك، انسخ كود الـ Widget أو الـ ID وضعه في الخانة بالأسفل ليتم جلب تعليقات الزبائن الحقيقية من قوقل ماب مباشرة إلى الموقع.'
+                        : 'After setting up Google Reviews widget on Elfsight for your car wash, paste the Widget ID or code below to load live customer reviews.'}
+                    </p>
+
+                    <div>
+                      <label className="text-xs font-bold text-white mb-1.5 flex items-center justify-between">
+                        <span>{lang === 'ar' ? 'معرّف أو كود ويدجت Elfsight (Widget ID)' : 'Elfsight Widget ID or Code'}</span>
+                        <span className="text-[10px] text-cyan-300 font-mono">مثال: elfsight-app-xxxxxx</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={elfsightWidgetId}
+                        onChange={(e) => setElfsightWidgetId(e.target.value)}
+                        placeholder="e.g. 5b7d8123-xxxx-xxxx-xxxx-xxxxxxxxxxxx أو elfsight-app-xxxx"
+                        className="w-full px-3 py-2 rounded-lg bg-[#070b16] border border-cyan-500/50 text-white font-mono text-xs focus:border-cyan-400 focus:outline-none placeholder:text-slate-600"
+                      />
+                    </div>
+
+                    {elfsightWidgetId && (
+                      <button
+                        type="button"
+                        onClick={() => setElfsightWidgetId('')}
+                        className="px-3 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900 border border-red-500/40 text-red-300 text-xs font-bold flex items-center gap-1.5 transition-all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>{lang === 'ar' ? 'مسح معرّف Elfsight' : 'Clear Elfsight Widget'}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Direct Google Review URLs */}
+                  <div className="p-3.5 rounded-xl bg-[#09152b] border border-amber-500/40 space-y-3 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                    <div className="flex items-center gap-2 text-amber-300 font-bold text-xs pb-1 border-b border-amber-500/20">
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      <span>{lang === 'ar' ? 'روابط كتابة التقييم المباشر على خرائط Google' : 'Direct Review Shortlinks'}</span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {lang === 'ar'
+                        ? 'هذه الروابط تنقل العميل مباشرة لفتح نافذة النجوم وكتابة التقييم على قوقل ماب لكل فرع:'
+                        : 'These links send users directly into the Google Maps review popup for each branch:'}
                     </p>
 
                     <div className="space-y-3 pt-1">
@@ -576,7 +691,7 @@ export function AdminDashboardModal({
                           className="w-full px-3 py-1.5 rounded-lg bg-[#070b16] border border-slate-700 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                         />
                         <span className="text-[10px] text-slate-400 mt-1 block">
-                          {lang === 'ar' ? 'هذا الرابط يفتح عند ضغط الزائر على زر "تقييم فرع الربوة"' : 'Opens when user clicks Rabwah review button'}
+                          {lang === 'ar' ? 'هذا الرابط يفتح عند ضغط الزائر على زر "اكتب تقييمك - فرع الربوة"' : 'Opens when user clicks Rabwah review button'}
                         </span>
                       </div>
 
@@ -594,7 +709,7 @@ export function AdminDashboardModal({
                           className="w-full px-3 py-1.5 rounded-lg bg-[#070b16] border border-slate-700 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                         />
                         <span className="text-[10px] text-slate-400 mt-1 block">
-                          {lang === 'ar' ? 'هذا الرابط يفتح عند ضغط الزائر على زر "تقييم فرع القرينية"' : 'Opens when user clicks Qurayniyyah review button'}
+                          {lang === 'ar' ? 'هذا الرابط يفتح عند ضغط الزائر على زر "اكتب تقييمك - فرع القرينية"' : 'Opens when user clicks Qurayniyyah review button'}
                         </span>
                       </div>
                     </div>
@@ -954,18 +1069,31 @@ export function AdminDashboardModal({
                     </div>
 
                     <div className="flex flex-col items-center gap-2 pt-2">
-                      <label className="cursor-pointer px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(0,210,255,0.4)] transition-all">
-                        <Upload className="w-4 h-4" />
-                        <span>{lang === 'ar' ? 'رفع صورة شعار من جهازك' : 'Upload New Logo File'}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageFileUpload}
-                        />
-                      </label>
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        <label className="cursor-pointer px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(0,210,255,0.4)] transition-all">
+                          <Upload className="w-4 h-4" />
+                          <span>{lang === 'ar' ? 'رفع صورة شعار جديدة' : 'Upload New Logo File'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageFileUpload}
+                          />
+                        </label>
+                        {logoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setLogoUrl('')}
+                            className="px-3 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 border border-red-500/40 text-xs font-bold flex items-center gap-1.5 transition-all"
+                            title={lang === 'ar' ? 'الرجوع للشعار الأصلي' : 'Revert to Original Logo'}
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            <span>{lang === 'ar' ? 'استعادة الشعار الأصلي' : 'Original Logo'}</span>
+                          </button>
+                        )}
+                      </div>
                       <span className="text-[10px] text-slate-400">
-                        {lang === 'ar' ? 'يدعم PNG و JPG (يُفضل خلفية سوداء أو شفافة)' : 'Supports PNG & JPG (Recommended dark/transparent)'}
+                        {lang === 'ar' ? 'يدعم PNG و JPG (يُفضل خلفية سوداء أو شفافة) - ويتم حفظه دائماً سحابياً' : 'Supports PNG & JPG (Recommended dark/transparent) - Cloud synced'}
                       </span>
                     </div>
                   </div>
