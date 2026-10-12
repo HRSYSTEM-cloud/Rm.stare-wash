@@ -166,9 +166,9 @@ export function GoogleReviewsPage({ lang, customData, onOpenAdmin }: GoogleRevie
             href={activeBranchData.googleReviewUrl || activeBranchData.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95"
+            className="w-full py-2.5 px-4 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95"
           >
-            <MessageSquarePlus className="w-4 h-4 text-amber-400" />
+            <MessageSquarePlus className="w-4 h-4 text-cyan-400" />
             <span>
               {lang === 'ar'
                 ? `اكتب تقييم 5 نجوم لـ (${activeBranch === 'al-rabwah' ? 'فرع الربوة' : 'فرع القرينية'})`
@@ -202,7 +202,7 @@ export function GoogleReviewsPage({ lang, customData, onOpenAdmin }: GoogleRevie
       <div className="rounded-2xl p-4 bg-gradient-to-b from-[#0a1224] to-[#060b16] border border-blue-900/50 shadow-md space-y-3">
         <div className="flex items-center justify-between border-b border-white/10 pb-2">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-4 h-4 text-cyan-400" />
             <h3 className="text-xs sm:text-sm font-black text-white">
               {lang === 'ar'
                 ? `تقييمات وآراء العملاء (${activeBranch === 'al-rabwah' ? 'فرع الربوة' : 'فرع القرينية'})`

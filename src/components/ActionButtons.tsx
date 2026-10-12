@@ -98,8 +98,8 @@ export function ActionButtons({
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>{lang === 'ar' ? 'متاحون لخدمتك 24/7' : 'Available Now 24/7'}</span>
               </div>
-              <div className="flex items-center gap-1 text-amber-400 text-[10px] font-bold">
-                <Sparkles className="w-3 h-3" />
+              <div className="flex items-center gap-1 text-cyan-400 text-[10px] font-bold">
+                <Sparkles className="w-3 h-3 text-cyan-400" />
                 <span className="text-slate-300">{lang === 'ar' ? 'فرعي الربوة والقرينية' : 'Rabwah & Khumrah'}</span>
               </div>
             </div>
@@ -171,21 +171,21 @@ export function ActionButtons({
       {/* 2. THE OFFICIAL LOYALTY CARD (4 غسلات والخامسة مجانًا + QR للمحفظة) */}
       <LoyaltyCard lang={lang} config={customData?.loyaltyCard} />
 
-      {/* 3. Rate Us on Google Maps by Branch */}
-      <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-[#120f08]/90 via-[#171208]/90 to-[#0a0803]/90 border border-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.12)] space-y-2">
+      {/* 3. Rate Us on Google Maps by Branch - Unified Royal Blue & Electric Cyan Identity */}
+      <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-[#0c1936]/90 via-[#071126]/90 to-[#030917]/90 border border-cyan-400/30 shadow-[0_0_15px_rgba(0,180,255,0.12)] space-y-2">
         <div className="flex items-center justify-between px-0.5">
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center text-black shadow-sm shrink-0">
-              <Star className="w-3 h-3 fill-black stroke-black" />
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-blue-600 via-cyan-500 to-blue-500 flex items-center justify-center text-white shadow-sm shrink-0">
+              <Star className="w-3 h-3 fill-white stroke-white" />
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[11px] sm:text-xs font-bold text-white">
                 {lang === 'ar' ? 'قيمنا على خرائط قوقل' : 'Rate on Google Maps'}
               </span>
-              <span className="text-amber-400 text-[9px] tracking-tight font-bold">★★★★★</span>
+              <span className="text-cyan-300 text-[9.5px] tracking-tight font-bold">★★★★★</span>
             </div>
           </div>
-          <span className="text-[9px] text-amber-200/60 font-medium">
+          <span className="text-[9px] text-cyan-200/70 font-medium">
             {lang === 'ar' ? 'رأيكم يشرفنا' : '5-Star Reviews'}
           </span>
         </div>
@@ -213,7 +213,7 @@ export function ActionButtons({
                   <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
                 </div>
               </div>
-              <span className="text-amber-400 text-[9px] shrink-0 font-bold">★ 5.0</span>
+              <span className="text-cyan-300 text-[9px] shrink-0 font-extrabold bg-cyan-950/80 px-1 py-0.5 rounded border border-cyan-500/30">★ 5.0</span>
             </div>
           </motion.a>
 
@@ -227,19 +227,19 @@ export function ActionButtons({
             rel="noopener noreferrer"
             className="relative group overflow-hidden rounded-lg p-[1px] focus:outline-none transition-all block"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/70 to-amber-500/70 rounded-lg opacity-70 group-hover:opacity-100 transition-opacity" />
-            <div className="relative px-2 py-1.5 sm:px-2.5 sm:py-2 bg-gradient-to-b from-[#240a0a] to-[#120404] rounded-[7px] border border-red-400/30 text-start flex items-center justify-between gap-1">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/70 to-cyan-400/70 rounded-lg opacity-70 group-hover:opacity-100 transition-opacity" />
+            <div className="relative px-2 py-1.5 sm:px-2.5 sm:py-2 bg-gradient-to-b from-[#08152b] to-[#040c1a] rounded-[7px] border border-blue-400/30 text-start flex items-center justify-between gap-1">
               <div className="min-w-0">
-                <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-rose-200 truncate">
-                  <MapPin className="w-2.5 h-2.5 text-red-400 shrink-0" />
+                <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-blue-100 truncate">
+                  <MapPin className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
                   <span className="truncate">{lang === 'ar' ? 'الربوة (الستين)' : 'Al Rabwah'}</span>
                 </div>
-                <div className="text-[9px] text-rose-300/80 font-medium flex items-center gap-0.5 mt-0.5">
+                <div className="text-[9px] text-cyan-300/80 font-medium flex items-center gap-0.5 mt-0.5">
                   <span>{lang === 'ar' ? 'تقييم الفرع' : 'Rate branch'}</span>
                   <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
                 </div>
               </div>
-              <span className="text-amber-400 text-[9px] shrink-0 font-bold">★ 5.0</span>
+              <span className="text-cyan-300 text-[9px] shrink-0 font-extrabold bg-blue-950/80 px-1 py-0.5 rounded border border-blue-400/30">★ 5.0</span>
             </div>
           </motion.a>
         </div>
@@ -248,7 +248,7 @@ export function ActionButtons({
           <button
             type="button"
             onClick={onGoToReviews}
-            className="w-full text-center text-[10px] font-medium text-amber-300/90 hover:text-amber-200 flex items-center justify-center gap-1 transition-colors py-0.5"
+            className="w-full text-center text-[10px] font-bold text-cyan-300/90 hover:text-cyan-200 flex items-center justify-center gap-1 transition-colors py-0.5"
           >
             <span>💬</span>
             <span>{lang === 'ar' ? 'تصفّح تقييمات العملاء الحية بالموقع' : 'View live customer reviews'}</span>
@@ -306,7 +306,7 @@ export function ActionButtons({
             <span>Apple Pay</span>
           </span>
           <span className="inline-flex items-center gap-1">
-            <Banknote className="w-3 h-3 text-amber-400" />
+            <Banknote className="w-3 h-3 text-cyan-400" />
             <span>{lang === 'ar' ? 'كاش' : 'Cash'}</span>
           </span>
         </div>

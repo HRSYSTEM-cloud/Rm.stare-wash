@@ -123,9 +123,9 @@ export function LinksPage({ customData }: LinksPageProps) {
                 isTiktok
                   ? 'bg-gradient-to-r from-[#070c18] via-[#09152b] to-[#070c18] border-cyan-400/40 hover:border-cyan-300 shadow-[0_0_15px_rgba(0,180,255,0.25)]'
                   : isSnapchat
-                    ? 'bg-[#151508] border-yellow-400/40 hover:border-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.2)]'
+                    ? 'bg-[#091325] border-yellow-400/30 hover:border-yellow-400/60 shadow-[0_0_12px_rgba(250,204,21,0.12)]'
                     : isInstagram
-                      ? 'bg-[#160a16] border-pink-500/40 hover:border-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.2)]'
+                      ? 'bg-[#0c0d1e] border-pink-500/30 hover:border-pink-400/60 shadow-[0_0_12px_rgba(236,72,153,0.12)]'
                       : isWhatsapp
                         ? 'bg-[#081513] border-emerald-500/30 hover:border-emerald-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.25)]'
                         : 'bg-[#070b16] border-blue-500/30 hover:border-blue-400'

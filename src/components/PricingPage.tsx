@@ -51,7 +51,7 @@ export function PricingPage({ lang, customData }: PricingPageProps) {
       nameEn: 'Large',
       subAr: 'جيب، تاهو، لاندكروزر',
       subEn: 'SUV, Patrol, Land Cruiser',
-      color: 'text-amber-300',
+      color: 'text-indigo-200',
     },
   ];
 
@@ -217,12 +217,12 @@ export function PricingPage({ lang, customData }: PricingPageProps) {
                   <div
                     className={`p-2 rounded-xl border text-center transition-all ${
                       selectedVehicle === 'large' || selectedVehicle === 'all'
-                        ? 'bg-black/40 border-amber-500/30'
+                        ? 'bg-black/40 border-cyan-500/30'
                         : 'opacity-40 border-transparent'
                     }`}
                   >
                     <span className="text-[10px] text-slate-400 block font-medium">كبير / جيب</span>
-                    <span className="text-sm font-black text-amber-300 font-mono">
+                    <span className="text-sm font-black text-cyan-200 font-mono">
                       {service.large} <span className="text-[10px] font-normal">ر.س</span>
                     </span>
                   </div>

@@ -825,11 +825,11 @@ export function AdminDashboardModal({
                   onClick={() => setActiveTab('reviews')}
                   className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
                     activeTab === 'reviews'
-                      ? 'bg-amber-600 text-white shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                      ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(0,140,255,0.4)]'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                  <Star className="w-3.5 h-3.5 text-cyan-300 fill-cyan-300" />
                   <span>{lang === 'ar' ? 'تقييم قوقل' : 'Reviews'}</span>
                 </button>
 
@@ -838,11 +838,11 @@ export function AdminDashboardModal({
                   onClick={() => setActiveTab('competitions')}
                   className={`py-2 px-1 text-[10px] sm:text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
                     activeTab === 'competitions'
-                      ? 'bg-amber-500 text-black shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                      ? 'bg-cyan-500 text-black shadow-[0_0_10px_rgba(0,210,255,0.4)] font-black'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Trophy className="w-3.5 h-3.5 text-amber-300" />
+                  <Trophy className="w-3.5 h-3.5 text-cyan-300" />
                   <span>{lang === 'ar' ? 'المسابقات' : 'Contests'}</span>
                 </button>
 
@@ -944,7 +944,7 @@ export function AdminDashboardModal({
                             {lang === 'ar' ? item.nameAr : item.nameEn}
                           </span>
                           {item.isExtra && (
-                            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30">
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-cyan-300 border border-cyan-500/30">
                               {lang === 'ar' ? 'إضافي' : 'Add-on'}
                             </span>
                           )}
@@ -1111,7 +1111,7 @@ export function AdminDashboardModal({
                           onChange={(e) =>
                             setLoyaltyCard({ ...loyaltyCard, headlineAr: e.target.value })
                           }
-                          className="w-full px-3 py-1.5 rounded-lg bg-black border border-slate-700 text-amber-300 font-bold text-xs"
+                          className="w-full px-3 py-1.5 rounded-lg bg-black border border-slate-700 text-cyan-300 font-bold text-xs"
                         />
                       </div>
 
@@ -1703,7 +1703,7 @@ export function AdminDashboardModal({
                     <button
                       type="button"
                       onClick={handleAddCompetition}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm"
                     >
                       <Plus className="w-4 h-4" />
                       <span>{lang === 'ar' ? 'إضافة مسابقة جديدة' : 'Add Contest'}</span>
@@ -1717,7 +1717,7 @@ export function AdminDashboardModal({
                         className="p-3.5 rounded-xl bg-black/60 border border-slate-800 space-y-2.5"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-amber-300">
+                          <span className="text-xs font-bold text-cyan-300">
                             {comp.titleAr}
                           </span>
                           <button
@@ -1755,7 +1755,7 @@ export function AdminDashboardModal({
                     />
                   </div>
                   <div className="p-3.5 rounded-xl bg-black/50 border border-slate-800 space-y-2.5">
-                    <label className="text-xs font-bold text-amber-300 block">
+                    <label className="text-xs font-bold text-cyan-300 block">
                       Snapchat URL:
                     </label>
                     <input
