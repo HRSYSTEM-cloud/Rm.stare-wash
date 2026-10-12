@@ -50,7 +50,7 @@ export function BranchCard({ branch, isHighlighted, lang }: BranchCardProps) {
   const branchNotes = lang === 'ar'
     ? branch.notes
     : isRabwah
-      ? 'Prime location, easy access, 24-hour express wash and polish.'
+      ? 'Prime location, easy access, 24-hour express car wash.'
       : 'Modern quick-wash equipment, 24/7 continuous operation.';
 
   return (

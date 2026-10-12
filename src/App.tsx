@@ -5,14 +5,15 @@ import { ActionButtons } from './components/ActionButtons';
 import { BranchesSection } from './components/BranchesSection';
 import { PricingPage } from './components/PricingPage';
 import { ServicesPage } from './components/ServicesPage';
+import { GalleryPage } from './components/GalleryPage';
 import { LinksPage } from './components/LinksPage';
 import { GoogleReviewsPage } from './components/GoogleReviewsPage';
+import { CompetitionsPage } from './components/CompetitionsPage';
 import { BottomNavigation, PageTab } from './components/BottomNavigation';
 import { BrandFooter } from './components/BrandFooter';
 import { CallModal } from './components/CallModal';
 import { WhatsAppModal } from './components/WhatsAppModal';
 import { ShareModal } from './components/ShareModal';
-import { OffersSection } from './components/OffersSection';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { Language, translations } from './data/translations';
 import {
@@ -30,7 +31,7 @@ export default function App() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
-  // Dynamic Customization (Logo, Contacts, Socials & Offers) synchronized with Firebase
+  // Dynamic Customization synchronized with Firebase & LocalStorage
   const [customData, setCustomData] = useState<AppCustomization>(getLocalStoredCustomization());
 
   useEffect(() => {
@@ -39,36 +40,43 @@ export default function App() {
       if (data) setCustomData(data);
     });
 
-    // 2. Realtime listener across all devices and visitors
-    const unsubscribe = subscribeToCustomization((updatedData) => {
-      setCustomData(updatedData);
+    // 2. Real-time subscription to Firestore
+    const unsubscribe = subscribeToCustomization((cloudData) => {
+      setCustomData(cloudData);
     });
 
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
-  const t = translations[lang];
+  const toggleLanguage = () => {
+    setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
+  };
 
   const handleTabChange = (tab: PageTab) => {
     setCurrentTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const toggleLanguage = () => {
-    setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
-  };
+  // Sync document title with language
+  useEffect(() => {
+    const t = translations[lang];
+    document.title = `${t.brandTitle} | ${t.brandSubtitle} — ${t.tagline}`;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }, [lang]);
 
   return (
     <div
       dir={lang === 'ar' ? 'rtl' : 'ltr'}
       className={`min-h-screen bg-[#05070c] text-white selection:bg-[#0066ff] selection:text-white relative overflow-x-hidden ${
-        lang === 'ar' ? "font-['Cairo',sans-serif]" : "font-sans"
-      } pb-24`}
+        lang === 'ar' ? "font-['Cairo',sans-serif]" : 'font-sans'
+      } pb-[max(96px,calc(env(safe-area-inset-bottom)+76px))]`}
     >
-      {/* Deep Solid Luxury Dark Background */}
-      <AnimatedBackground />
+      {/* Deep Solid Luxury Dark Background with Custom Wallpaper support */}
+      <AnimatedBackground
+        backgroundImageUrl={customData.backgroundImageUrl}
+        overlayOpacity={customData.backgroundOverlayOpacity}
+      />
 
       {/* Main Container - Optimized for mobile viewports (100% Mobile First) */}
       <main className="relative z-10 w-full max-w-md mx-auto px-3 sm:px-4 py-2 flex flex-col justify-between min-h-screen">
@@ -83,10 +91,9 @@ export default function App() {
             onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
           />
 
-          {/* PAGE 1: HOME (الرئيسية) */}
+          {/* PAGE 1: HOME */}
           {currentTab === 'home' && (
             <div className="space-y-3 animate-fadeIn">
-              {/* Core Action Buttons with Dynamic Phone/Social Settings */}
               <ActionButtons
                 lang={lang}
                 customData={customData}
@@ -94,62 +101,62 @@ export default function App() {
                 onGoToPrices={() => handleTabChange('prices')}
                 onGoToLinks={() => handleTabChange('links')}
                 onGoToReviews={() => handleTabChange('reviews')}
+                onGoToCompetitions={() => handleTabChange('competitions')}
+                onGoToGallery={() => handleTabChange('gallery')}
                 onOpenCallModal={() => setIsCallModalOpen(true)}
                 onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
                 onOpenLinksModal={() => setIsLinksModalOpen(true)}
               />
-
-              {/* Dynamic Offers Section (Managed via Hidden Admin Panel) */}
-              <OffersSection offers={customData.offers} lang={lang} />
-
-              {/* Quick Branch Teaser Card */}
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#091224] to-[#070d1a] border border-blue-500/25 flex items-center justify-between gap-3">
-                <div className="text-start">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>{t.teaserTitle}</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 mt-0.5">
-                    {t.teaserDesc}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleTabChange('branches')}
-                  className="px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-extrabold shadow-[0_0_12px_#00e5ff] transition-all shrink-0"
-                >
-                  {t.teaserBtn}
-                </button>
-              </div>
             </div>
           )}
 
-          {/* PAGE 2: PRICING (قائمة الأسعار المعتمدة) */}
+          {/* PAGE 2: PRICING */}
           {currentTab === 'prices' && (
             <div className="animate-fadeIn">
               <PricingPage lang={lang} customData={customData} />
             </div>
           )}
 
-          {/* PAGE 3: BRANCHES (الفروع والخرائط) */}
+          {/* PAGE 3: BRANCHES */}
           {currentTab === 'branches' && (
             <div className="animate-fadeIn">
               <BranchesSection lang={lang} customData={customData} />
             </div>
           )}
 
-          {/* PAGE 4: SERVICES (الخدمات والغسيل) */}
+          {/* PAGE 4: SERVICES */}
           {currentTab === 'services' && (
             <div className="animate-fadeIn">
               <ServicesPage
                 lang={lang}
+                customData={customData}
                 onOpenCallModal={() => setIsCallModalOpen(true)}
                 onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
               />
             </div>
           )}
 
-          {/* PAGE 5: GOOGLE REVIEWS (تقييمات قوقل) */}
-          {currentTab === 'reviews' && (
+          {/* PAGE 5: GALLERY (المعرض: صور وفيديوهات) */}
+          {currentTab === 'gallery' && customData.showGalleryTab !== false && (
+            <div className="animate-fadeIn">
+              <GalleryPage lang={lang} items={customData.galleryItems} />
+            </div>
+          )}
+
+          {/* PAGE 6: COMPETITIONS */}
+          {currentTab === 'competitions' && customData.showCompetitionsTab !== false && (
+            <div className="animate-fadeIn">
+              <CompetitionsPage
+                lang={lang}
+                customData={customData}
+                onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
+                onGoToPrices={() => handleTabChange('prices')}
+              />
+            </div>
+          )}
+
+          {/* PAGE 7: GOOGLE REVIEWS */}
+          {currentTab === 'reviews' && customData.showReviewsTab !== false && (
             <div className="animate-fadeIn">
               <GoogleReviewsPage
                 lang={lang}
@@ -159,7 +166,7 @@ export default function App() {
             </div>
           )}
 
-          {/* PAGE 6: LINKS (الحسابات وروابط التواصل) */}
+          {/* PAGE 8: LINKS */}
           {currentTab === 'links' && (
             <div className="animate-fadeIn">
               <LinksPage customData={customData} />
@@ -176,34 +183,41 @@ export default function App() {
         currentTab={currentTab}
         onTabChange={handleTabChange}
         lang={lang}
+        showReviewsTab={customData.showReviewsTab !== false}
+        showCompetitionsTab={customData.showCompetitionsTab !== false}
+        showGalleryTab={customData.showGalleryTab !== false}
       />
 
-      {/* Secret Admin Dashboard Modal (Opens on 5 taps on Logo + password 0001000) */}
-      <AdminDashboardModal
-        isOpen={isAdminModalOpen}
-        onClose={() => setIsAdminModalOpen(false)}
-        lang={lang}
-        currentData={customData}
-        onSave={(newData) => setCustomData(newData)}
-      />
-
-      {/* Modals with Dynamic Cloud Phone & WhatsApp Numbers */}
+      {/* Modals */}
       <CallModal
         isOpen={isCallModalOpen}
         onClose={() => setIsCallModalOpen(false)}
         lang={lang}
         customData={customData}
       />
+
       <WhatsAppModal
         isOpen={isWhatsAppModalOpen}
         onClose={() => setIsWhatsAppModalOpen(false)}
         lang={lang}
         customData={customData}
       />
+
       <ShareModal
         isOpen={isLinksModalOpen}
         onClose={() => setIsLinksModalOpen(false)}
         lang={lang}
+      />
+
+      {/* Admin Dashboard Modal */}
+      <AdminDashboardModal
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
+        lang={lang}
+        currentData={customData}
+        onSave={(updated) => {
+          setCustomData(updated);
+        }}
       />
     </div>
   );

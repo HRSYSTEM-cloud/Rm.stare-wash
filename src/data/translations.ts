@@ -13,9 +13,11 @@ export const translations = {
     // Bottom Nav Tabs
     tabHome: 'الرئيسية',
     tabPrices: 'الأسعار',
-    tabBranches: 'الفروع (2)',
+    tabBranches: 'الفروع',
     tabServices: 'خدماتنا',
-    tabReview: 'تقييم Google',
+    tabGallery: 'المعرض',
+    tabCompetitions: 'المسابقات',
+    tabReview: 'تقييم قوقل',
     tabLinks: 'حساباتنا',
     
     // Action Buttons
@@ -67,7 +69,7 @@ export const translations = {
     servicesTitle: 'خدمات RM.STAR لغسيل السيارات',
     servicesSubtitle: 'أحدث معدات الغسيل والرغوة والشامبو المعتمد',
     serviceWashTitle: 'غسيل واش احترافي متكامل',
-    serviceWashDesc: 'غسيل خارجي برغوة ثلجية كثيفة مع تنظيف وتلميع الجنوط وإزالة الأوساخ المستعصية بأمان تام.',
+    serviceWashDesc: 'غسيل خارجي برغوة ثلجية كثيفة مع تنظيف الجنوط والكفرات وإزالة الأوساخ المستعصية بأمان تام.',
     servicePolishTitle: 'غسيل بستم وأسفل الهيكل',
     servicePolishDesc: 'تنظيف قوي بضغط مائي مرتفع لأسفل السيارة يزيل الطين والأملاح والرواسب لحماية الشاسيه.',
     serviceInteriorTitle: 'تنظيف وتعقيم المقصورة الداخلية',
@@ -99,7 +101,7 @@ export const translations = {
     // Header & Meta
     brandTitle: 'RM.STAR',
     brandSubtitle: 'STAR CAR WASH',
-    tagline: 'Premium Auto Wash & Detailing • Jeddah',
+    tagline: 'Premium Auto Wash • Jeddah',
     open247: '24/7 OPEN',
     heroDesc: 'Professional 24-hour car washing using advanced equipment and genuine car care formulas in Jeddah.',
     servingYou: 'Serving you across 2 prime locations in Jeddah, 24/7',
@@ -107,9 +109,11 @@ export const translations = {
     // Bottom Nav Tabs
     tabHome: 'Home',
     tabPrices: 'Prices',
-    tabBranches: 'Branches (2)',
+    tabBranches: 'Branches',
     tabServices: 'Services',
-    tabReview: 'Google Review',
+    tabGallery: 'Gallery',
+    tabCompetitions: 'Contests',
+    tabReview: 'Reviews',
     tabLinks: 'Links',
 
     // Action Buttons
@@ -122,7 +126,7 @@ export const translations = {
     btnWhatsApp: 'Direct WhatsApp',
     btnWhatsAppDesc: 'Instant chat for both branches',
     btnTikTok: 'Official TikTok',
-    btnTikTokDesc: 'Watch our detailing & special offers',
+    btnTikTokDesc: 'Watch our car washes & special offers',
     btnAllLinks: 'All Accounts & Links',
     btnAllLinksDesc: 'Locations, phone numbers & socials',
 
@@ -161,10 +165,10 @@ export const translations = {
     servicesTitle: 'RM.STAR Auto Wash Services',
     servicesSubtitle: 'Latest washing gear & premium genuine washing shampoos',
     serviceWashTitle: 'Full Exterior Snow Foam Wash',
-    serviceWashDesc: 'Gentle thick snow foam wash, rim detailing, tire shine, and dirt elimination without scratching paint.',
+    serviceWashDesc: 'Gentle thick snow foam wash, rim and tire care, and dirt elimination without scratching paint.',
     servicePolishTitle: 'Undercarriage & Chassis Wash',
     servicePolishDesc: 'High-pressure underbody cleaning removing mud, grime, and road salt to protect the vehicle chassis.',
-    serviceInteriorTitle: 'Interior Detailing & Sanitization',
+    serviceInteriorTitle: 'Interior Cleaning & Sanitization',
     serviceInteriorDesc: 'Deep seat, dashboard, and carpet care with full interior ozone sanitization removing odors and allergens.',
     serviceExpressTitle: 'Express 24/7 Express Lane',
     serviceExpressDesc: 'Dedicated quick-wash lanes with trained crews delivering pristine results around the clock.',

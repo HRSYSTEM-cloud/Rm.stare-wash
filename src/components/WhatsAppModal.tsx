@@ -162,13 +162,16 @@ export function WhatsAppModal({ isOpen, onClose, lang, customData }: WhatsAppMod
             </div>
 
             {/* Submit Button */}
-            <button
-              onClick={handleSendWhatsApp}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-extrabold text-sm shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2"
+            <a
+              href={`https://wa.me/${activeBranch.whatsappNumber}?text=${encodeURIComponent(customMessage.trim() || selectedMessage)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setTimeout(onClose, 300)}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-extrabold text-sm shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 active:scale-95"
             >
               <Send className="w-4 h-4" />
               <span>{lang === 'ar' ? 'فتح المحادثة في واتساب' : 'Open in WhatsApp'}</span>
-            </button>
+            </a>
           </motion.div>
         </div>
       )}

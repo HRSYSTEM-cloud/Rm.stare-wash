@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #05070c;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -15,39 +38,14 @@
   animation: fadeIn 0.28s ease-out forwards;
 }
 
-/* Elfsight mobile optimization */
-[class*="elfsight-app-"] {
-  width: 100% !important;
-  max-width: 100% !important;
-  display: block !important;
-}
-
-[class*="elfsight-app-"] iframe {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-/* Hide Elfsight Free Plan Watermark Link & Badge */
+/* Elfsight widget styling and watermark cleanup */
 a[href*="elfsight.com"],
 a[href*="free-widget"],
-a[href*="utm_campaign=free-widget"],
-[class*="elfsight"] a[href*="elfsight.com"],
-[class*="elfsight-app-"] a[href*="elfsight.com"],
-[class*="elfsight-app-"] [class*="badge" i],
-[class*="elfsight-app-"] [class*="eapps-link" i],
 [class*="elfsight-app-"] > a:last-child {
   display: none !important;
-  visibility: hidden !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   pointer-events: none !important;
   height: 0 !important;
-  width: 0 !important;
-  max-height: 0 !important;
-  max-width: 0 !important;
-  line-height: 0 !important;
   font-size: 0 !important;
-  position: absolute !important;
-  top: -9999px !important;
-  left: -9999px !important;
-  overflow: hidden !important;
 }

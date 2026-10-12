@@ -214,7 +214,7 @@ export const SERVICES_HIGHLIGHTS: ServiceHighlight[] = [
   {
     id: 'wash',
     title: 'غسيل واش احترافي',
-    desc: 'رغوة ثلجية، شامبو نانو، حماية وتلميع الكفرات والجنوط',
+    desc: 'رغوة ثلجية، شامبو نانو، حماية وتسويد الكفرات وتنظيف الجنوط',
     icon: 'Sparkles',
   },
   {

@@ -1,16 +1,22 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Star,
+  CheckCircle,
   ExternalLink,
+  MessageSquarePlus,
   MapPin,
-  RefreshCw,
   Sparkles,
-  ShieldCheck,
-  Settings,
+  PlusCircle,
 } from 'lucide-react';
-import { getDynamicBranches } from '../data/branches';
 import { Language } from '../data/translations';
-import { AppCustomization, DEFAULT_ELFSIGHT_WIDGET_ID } from '../data/customization';
+import {
+  AppCustomization,
+  DEFAULT_RABWAH_ELFSIGHT_ID,
+  DEFAULT_QURAYNIYYAH_ELFSIGHT_ID,
+  sanitizeElfsightId,
+  isValidElfsightId,
+} from '../data/customization';
+import { getDynamicBranches } from '../data/branches';
 
 interface GoogleReviewsPageProps {
   lang: Language;
@@ -19,240 +25,89 @@ interface GoogleReviewsPageProps {
 }
 
 export function GoogleReviewsPage({ lang, customData, onOpenAdmin }: GoogleReviewsPageProps) {
+  // Default to 'al-rabwah' (الربوة)
+  const [activeBranch, setActiveBranch] = useState<'al-rabwah' | 'al-qurayniyyah'>('al-rabwah');
   const branches = getDynamicBranches(customData);
-  const rabwah = branches.find((b) => b.id === 'al-rabwah') || branches[0];
-  const qurayniyyah = branches.find((b) => b.id === 'al-qurayniyyah') || branches[1];
+  const activeBranchData = branches.find((b) => b.id === activeBranch) || branches[0];
 
-  const rabwahReviewUrl = rabwah.googleReviewUrl || rabwah.googleMapsUrl;
-  const qurayniyyahReviewUrl = qurayniyyah.googleReviewUrl || qurayniyyah.googleMapsUrl;
+  const rabwahWidgetId = sanitizeElfsightId(
+    customData?.elfsightRabwahWidgetId || customData?.elfsightWidgetId,
+    DEFAULT_RABWAH_ELFSIGHT_ID
+  );
 
-  const rawElfsight = (customData?.elfsightWidgetId !== undefined
-    ? customData.elfsightWidgetId
-    : DEFAULT_ELFSIGHT_WIDGET_ID
-  ).trim();
-  
-  // Extract ID if user pastes full class like "elfsight-app-xxxx" or raw code
-  let elfsightAppClass = '';
-  if (rawElfsight) {
-    if (rawElfsight.includes('elfsight-app-')) {
-      const match = rawElfsight.match(/elfsight-app-[a-zA-Z0-9_-]+/);
-      elfsightAppClass = match ? match[0] : rawElfsight;
-    } else {
-      elfsightAppClass = `elfsight-app-${rawElfsight}`;
-    }
-  }
+  const qurayniyyahWidgetId = sanitizeElfsightId(
+    customData?.elfsightQurayniyyahWidgetId,
+    DEFAULT_QURAYNIYYAH_ELFSIGHT_ID
+  );
 
-  const widgetContainerRef = useRef<HTMLDivElement>(null);
-
-  // Guarantee Elfsight widget renders immediately on mobile without scroll delay
+  // Ensure Elfsight script runs and detects the widgets
   useEffect(() => {
-    if (!widgetContainerRef.current || !elfsightAppClass) return;
-
-    const container = widgetContainerRef.current;
-    // Clear and insert fresh div without lazy flag so it mounts immediately on mobile
-    container.innerHTML = '';
-    const el = document.createElement('div');
-    el.className = elfsightAppClass;
-    container.appendChild(el);
-
-    const triggerInit = () => {
+    // If eapps platform is ready, trigger initialization
+    const w = window as unknown as { eapps?: { platform?: { initialize?: () => void } } };
+    if (w.eapps?.platform?.initialize) {
       try {
-        if ((window as any).ElfsightPlatform && typeof (window as any).ElfsightPlatform.init === 'function') {
-          (window as any).ElfsightPlatform.init();
-        }
+        w.eapps.platform.initialize();
       } catch (err) {
-        // ignore
+        console.warn('Elfsight init:', err);
       }
-      window.dispatchEvent(new Event('resize'));
-      window.dispatchEvent(new Event('scroll'));
-    };
-
-    // Make sure platform script is loaded
-    if (!document.getElementById('elfsight-platform-script')) {
-      const script = document.createElement('script');
-      script.id = 'elfsight-platform-script';
-      script.src = 'https://elfsightcdn.com/platform.js';
-      script.async = true;
-      script.onload = () => {
-        setTimeout(triggerInit, 100);
-      };
-      document.body.appendChild(script);
-    } else {
-      triggerInit();
     }
-
-    // Active cleaner for Elfsight Free Watermark link & badge
-    const cleanWatermark = () => {
-      try {
-        // Query all links pointing to elfsight.com or containing free-widget
-        const targets = document.querySelectorAll(
-          'a[href*="elfsight.com"], a[href*="free-widget"], a[href*="utm_campaign=free-widget"], [class*="eapps-link"]'
-        );
-        targets.forEach((node) => {
-          const el = node as HTMLElement;
-          el.style.setProperty('display', 'none', 'important');
-          el.style.setProperty('visibility', 'hidden', 'important');
-          el.style.setProperty('opacity', '0', 'important');
-          el.style.setProperty('height', '0', 'important');
-          el.style.setProperty('width', '0', 'important');
-          el.style.setProperty('position', 'absolute', 'important');
-          el.style.setProperty('pointer-events', 'none', 'important');
-          if (el.parentNode) {
-            try {
-              el.parentNode.removeChild(el);
-            } catch (err) {
-              // ignore
-            }
-          }
-        });
-
-        // Also check inside Shadow DOM if present
-        if (widgetContainerRef.current) {
-          const allChildren = widgetContainerRef.current.querySelectorAll('*');
-          allChildren.forEach((child) => {
-            if (child.shadowRoot) {
-              const shadowLinks = child.shadowRoot.querySelectorAll('a[href*="elfsight.com"], a[href*="free-widget"]');
-              shadowLinks.forEach((sl) => {
-                const el = sl as HTMLElement;
-                el.style.setProperty('display', 'none', 'important');
-                if (el.parentNode) {
-                  try {
-                    el.parentNode.removeChild(el);
-                  } catch (e) {
-                    // ignore
-                  }
-                }
-              });
-              if (!child.shadowRoot.querySelector('#hide-elfsight-style')) {
-                const style = document.createElement('style');
-                style.id = 'hide-elfsight-style';
-                style.textContent = `
-                  a[href*="elfsight.com"], a[href*="free-widget"], [class*="badge" i], [class*="eapps-link" i] {
-                    display: none !important;
-                    visibility: hidden !important;
-                    opacity: 0 !important;
-                    height: 0 !important;
-                    width: 0 !important;
-                  }
-                `;
-                child.shadowRoot.appendChild(style);
-              }
-            }
-          });
-        }
-      } catch (e) {
-        // ignore
-      }
-    };
-
-    // Run cleaner immediately and on mutations
-    cleanWatermark();
-    const observer = new MutationObserver(() => {
-      cleanWatermark();
-    });
-
-    if (widgetContainerRef.current) {
-      observer.observe(widgetContainerRef.current, { childList: true, subtree: true });
-    }
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    const cleanInterval = setInterval(cleanWatermark, 400);
-
-    const t1 = setTimeout(triggerInit, 250);
-    const t2 = setTimeout(triggerInit, 800);
-    const t3 = setTimeout(triggerInit, 2000);
-
-    return () => {
-      observer.disconnect();
-      clearInterval(cleanInterval);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [elfsightAppClass]);
-
-  const reloadWidget = () => {
-    if (!widgetContainerRef.current || !elfsightAppClass) return;
-    const container = widgetContainerRef.current;
-    container.innerHTML = '';
-    const el = document.createElement('div');
-    el.className = elfsightAppClass;
-    container.appendChild(el);
-
-    try {
-      if ((window as any).ElfsightPlatform) {
-        (window as any).ElfsightPlatform.init();
-      }
-    } catch (e) {
-      // ignore
-    }
-    window.dispatchEvent(new Event('resize'));
-  };
+  }, [activeBranch]);
 
   return (
-    <div className="space-y-3.5 pt-1 animate-fadeIn">
+    <div className="space-y-4 pt-1 animate-fadeIn pb-8 text-start">
       {/* 1. Header with Google Maps Branding */}
       <div className="text-center space-y-1">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-500/40 text-cyan-300 text-xs font-bold shadow-sm">
           <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-          <span>{lang === 'ar' ? 'تقييمات العملاء المعتمدة — Google Maps' : 'Verified Google Maps Reviews'}</span>
+          <span>{lang === 'ar' ? 'خرائط Google — تقييمات العملاء' : 'Google Maps Reviews'}</span>
         </div>
-        <h2 className="text-xl font-black text-white">
-          {lang === 'ar' ? 'آراء عملاء مغسلة نجمة آر إم' : 'Customer Reviews'}
+        <h2 className="text-xl sm:text-2xl font-black text-white">
+          {lang === 'ar' ? 'تقييمات عملاء مغسلة RM.STAR' : 'Customer Reviews'}
         </h2>
         <p className="text-xs text-slate-300">
           {lang === 'ar'
-            ? 'مسحوبة وموثقة بشكل مباشر وحقيقي من خرائط Google'
-            : 'Live customer reviews pulled directly from Google Maps'}
+            ? 'تصفح تقييمات العملاء الحقيقية مباشرة على خرائط Google'
+            : 'Explore real customer feedback directly on Google Maps'}
         </p>
       </div>
 
-      {/* 2. Direct Mobile Action Buttons (Clear, Big, Touch-Friendly) */}
-      <div className="grid grid-cols-2 gap-2">
-        <a
-          href={rabwahReviewUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-[#121c32] to-[#0a1122] border border-red-500/50 hover:border-red-400 text-white shadow-md active:scale-95 transition-all text-center group"
+      {/* 2. Branch Selector Tabs (الربوة / القرينية) */}
+      <div className="grid grid-cols-2 gap-1.5 p-1 bg-black/60 rounded-xl border border-blue-950 shadow-md">
+        <button
+          type="button"
+          onClick={() => setActiveBranch('al-rabwah')}
+          className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            activeBranch === 'al-rabwah'
+              ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_0_12px_rgba(220,38,38,0.6)] font-black'
+              : 'text-slate-400 hover:text-white'
+          }`}
         >
-          <div className="w-8 h-8 rounded-full bg-red-950/80 border border-red-500/50 flex items-center justify-center text-red-400 mb-1.5 group-hover:scale-110 transition-transform">
-            <MapPin className="w-4 h-4" />
-          </div>
-          <span className="text-xs font-black text-white">
-            {lang === 'ar' ? 'تقييم فرع الربوة' : 'Rate Al Rabwah'}
-          </span>
-          <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold mt-0.5">
-            <span>★★★★★</span>
-            <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
-          </div>
-        </a>
+          <span className="w-2 h-2 rounded-full bg-red-400" />
+          <span>{lang === 'ar' ? 'فرع الربوة (الستين)' : 'Al Rabwah'}</span>
+          {activeBranch === 'al-rabwah' && <CheckCircle className="w-3 h-3 text-red-200" />}
+        </button>
 
-        <a
-          href={qurayniyyahReviewUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-[#121c32] to-[#0a1122] border border-blue-500/50 hover:border-blue-400 text-white shadow-md active:scale-95 transition-all text-center group"
+        <button
+          type="button"
+          onClick={() => setActiveBranch('al-qurayniyyah')}
+          className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            activeBranch === 'al-qurayniyyah'
+              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.6)] font-black'
+              : 'text-slate-400 hover:text-white'
+          }`}
         >
-          <div className="w-8 h-8 rounded-full bg-blue-950/80 border border-blue-500/50 flex items-center justify-center text-blue-400 mb-1.5 group-hover:scale-110 transition-transform">
-            <MapPin className="w-4 h-4" />
-          </div>
-          <span className="text-xs font-black text-white">
-            {lang === 'ar' ? 'تقييم فرع القرينية' : 'Rate Al Qurayniyyah'}
-          </span>
-          <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold mt-0.5">
-            <span>★★★★★</span>
-            <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
-          </div>
-        </a>
+          <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <span>{lang === 'ar' ? 'فرع القرينية (الخمرة)' : 'Al Qurayniyyah'}</span>
+          {activeBranch === 'al-qurayniyyah' && <CheckCircle className="w-3 h-3 text-cyan-200" />}
+        </button>
       </div>
 
-      {/* 3. Live Google Reviews Elfsight Feed (Fully Optimized for Mobile Viewport) */}
-      <div className="rounded-2xl bg-[#09101f] border border-cyan-500/40 p-3 sm:p-4 shadow-[0_0_25px_rgba(0,180,255,0.15)] relative overflow-visible">
-        {/* Top bar of widget */}
-        <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-cyan-500/20">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
+      {/* 3. Direct Google Maps Real Hub Card */}
+      <div className="rounded-2xl p-4 bg-gradient-to-b from-[#0b1428] via-[#091020] to-[#060b16] border border-cyan-500/40 shadow-[0_0_25px_rgba(0,140,255,0.2)] space-y-3.5">
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0">
+              <svg className="w-6 h-6" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
@@ -272,83 +127,140 @@ export function GoogleReviewsPage({ lang, customData, onOpenAdmin }: GoogleRevie
               </svg>
             </div>
             <div>
-              <div className="text-xs font-black text-white flex items-center gap-1.5">
-                <span>{lang === 'ar' ? 'التعليقات الحية من Google' : 'Live Google Reviews'}</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-0.5">
-                  <ShieldCheck className="w-2.5 h-2.5" />
-                  <span>مباشر</span>
-                </span>
-              </div>
-              <div className="text-[10px] text-slate-400">
-                {lang === 'ar' ? 'تتحدث تلقائياً مع كل تقييم جديد' : 'Auto-synced with Google'}
-              </div>
+              <h3 className="text-sm sm:text-base font-black text-white">
+                {lang === 'ar'
+                  ? `تقييمات (${activeBranch === 'al-rabwah' ? 'فرع الربوة' : 'فرع القرينية'})`
+                  : activeBranchData.name}
+              </h3>
+              <p className="text-[11px] text-cyan-300 font-medium">
+                {lang === 'ar' ? 'على تطبيق وموقع خرائط Google الرسمي' : 'Official Google Maps Business Profile'}
+              </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={reloadWidget}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all text-[11px] flex items-center gap-1"
-            title="تحديث التعليقات"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span className="text-[10px] hidden sm:inline">{lang === 'ar' ? 'تحديث' : 'Refresh'}</span>
-          </button>
+          <div className="flex items-center text-amber-400 shrink-0">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 stroke-amber-400" />
+            ))}
+          </div>
         </div>
 
-        {/* The Live Elfsight Container - Unrestricted, full-width, clean for Mobile */}
-        <div
-          ref={widgetContainerRef}
-          className="w-full min-h-[220px] flex items-center justify-center overflow-visible"
-        >
-          {/* Fallback loading indicator while Elfsight renders */}
-          <div className="text-center py-8 space-y-2 text-slate-400 text-xs">
-            <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p>{lang === 'ar' ? 'جاري تحميل تقييمات Google...' : 'Loading Google reviews...'}</p>
+        {/* Primary Action Buttons */}
+        <div className="space-y-2">
+          <a
+            href={activeBranchData.googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(0,180,255,0.4)] flex items-center justify-center gap-2 active:scale-95"
+          >
+            <MapPin className="w-4 h-4 text-cyan-200" />
+            <span>
+              {lang === 'ar'
+                ? `فتح وقراءة كافة التقييمات في خرائط Google مباشرة`
+                : 'Open & Read All Reviews in Google Maps'}
+            </span>
+            <ExternalLink className="w-4 h-4 text-cyan-100" />
+          </a>
+
+          <a
+            href={activeBranchData.googleReviewUrl || activeBranchData.googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95"
+          >
+            <MessageSquarePlus className="w-4 h-4 text-amber-400" />
+            <span>
+              {lang === 'ar'
+                ? `اكتب تقييم 5 نجوم لـ (${activeBranch === 'al-rabwah' ? 'فرع الربوة' : 'فرع القرينية'})`
+                : 'Write a Review on Google Maps'}
+            </span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        {/* Interactive Google Maps Preview Frame */}
+        <div className="pt-2">
+          <div className="text-[11px] font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+            <span>{lang === 'ar' ? 'معاينة موقع ونشاط الفرع على خرائط قوقل:' : 'Google Maps Live Embed:'}</span>
+          </div>
+          <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-blue-500/30 bg-black/60 shadow-inner">
+            <iframe
+              title={`Google Map - ${activeBranchData.name}`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                activeBranchData.embedMapQuery
+              )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              className="w-full h-full border-0 grayscale-[15%] contrast-[105%]"
+              loading="lazy"
+              allowFullScreen
+            />
           </div>
         </div>
       </div>
 
-      {/* 4. Tips for Mobile Display Customization on Elfsight */}
-      <div className="p-3.5 rounded-2xl bg-[#081224] border border-slate-800 text-start space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-cyan-300 text-xs font-bold">
+      {/* 4. Live Elfsight Google Reviews Section */}
+      <div className="rounded-2xl p-4 bg-gradient-to-b from-[#0a1224] to-[#060b16] border border-blue-900/50 shadow-md space-y-3">
+        <div className="flex items-center justify-between border-b border-white/10 pb-2">
+          <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>{lang === 'ar' ? 'كيف تجعلها واضحة وأكبر للجوال؟' : 'How to make it bigger on mobile?'}</span>
+            <h3 className="text-xs sm:text-sm font-black text-white">
+              {lang === 'ar'
+                ? `تقييمات وآراء العملاء (${activeBranch === 'al-rabwah' ? 'فرع الربوة' : 'فرع القرينية'})`
+                : `Customer Reviews (${activeBranchData.name})`}
+            </h3>
           </div>
-
-          {onOpenAdmin && (
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              className="text-[10px] px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center gap-1"
-            >
-              <Settings className="w-3 h-3 text-cyan-400" />
-              <span>{lang === 'ar' ? 'لوحة التحكم' : 'Admin'}</span>
-            </button>
-          )}
+          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-950 text-cyan-300 border border-blue-500/30">
+            Google Reviews
+          </span>
         </div>
 
+        {/* Elfsight Widgets - Both in DOM for instant availability */}
+        <div className="min-h-[220px] rounded-xl bg-black/30 p-2">
+          {/* Rabwah Widget */}
+          <div className={activeBranch === 'al-rabwah' ? 'block' : 'hidden'}>
+            {isValidElfsightId(rabwahWidgetId) ? (
+              <div className={`elfsight-app-${rabwahWidgetId}`} />
+            ) : (
+              <div className="text-center py-8 text-xs text-slate-400">
+                {lang === 'ar' ? 'جاري تحميل تقييمات فرع الربوة...' : 'Loading Rabwah reviews...'}
+              </div>
+            )}
+          </div>
+
+          {/* Qurayniyyah Widget */}
+          <div className={activeBranch === 'al-qurayniyyah' ? 'block' : 'hidden'}>
+            {isValidElfsightId(qurayniyyahWidgetId) ? (
+              <div className={`elfsight-app-${qurayniyyahWidgetId}`} />
+            ) : (
+              <div className="text-center py-8 text-xs text-slate-400">
+                {lang === 'ar' ? 'جاري تحميل تقييمات فرع القرينية...' : 'Loading Qurayniyyah reviews...'}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Guidance and Admin Link */}
+      <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-start space-y-1.5">
+        <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
+          <MapPin className="w-4 h-4 text-cyan-400" />
+          <span>{lang === 'ar' ? 'رابط تقييمات الفرع على خرائط قوقل:' : 'Branch Reviews Link:'}</span>
+        </div>
         <p className="text-[11px] text-slate-300 leading-relaxed">
           {lang === 'ar'
-            ? 'في موقع Elfsight يمكنك تخصيص مظهر الويدجت وتكبير الخط بنقرة واحدة:'
-            : 'Inside your Elfsight dashboard you can easily enlarge fonts and cards:'}
+            ? 'يمكنك دائماً تحديث رابط الفرع أو كود التقييمات في أي وقت من خلال لوحة التحكم.'
+            : 'You can update your Google Maps link or review widget code anytime from the admin panel.'}
         </p>
-
-        <ul className="text-[10px] text-slate-300 space-y-1 list-disc list-inside">
-          <li>
-            <strong className="text-white">من تبويب Layout:</strong> اختر نوع العرض <span className="text-cyan-300 font-bold">Carousel (شريط متحرك)</span> أو <span className="text-cyan-300 font-bold">Grid (شبكة)</span> وهو الأوضح لشاشات الجوال.
-          </li>
-          <li>
-            <strong className="text-white">من تبويب Style:</strong> يمكنك زيادة <span className="text-cyan-300 font-bold">Font Size (حجم الخط)</span> إلى Large أو Custom ليكون الكلام كبيراً وواضحاً على الهواتف.
-          </li>
-          <li>
-            <strong className="text-white">Dark Theme:</strong> اختر الثيم الغامق (Dark) ليتطابق مع ألوان المغسلة الفخمة.
-          </li>
-        </ul>
-        <p className="text-[10px] text-emerald-400 font-semibold pt-1">
-          ✓ أي تعديل تقوم به داخل Elfsight يظهر في موقعك تلقائياً وبدون الحاجة لنسخ كود جديد!
-        </p>
+        {onOpenAdmin && (
+          <button
+            type="button"
+            onClick={onOpenAdmin}
+            className="inline-flex items-center gap-1.5 text-[11px] text-cyan-300 hover:text-white font-bold underline pt-1"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>{lang === 'ar' ? 'فتح لوحة التحكم لتعديل الإعدادات' : 'Open Admin Settings'}</span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,13 +1,21 @@
 import { Sparkles, Shield, Car, Zap, CheckCircle2, PhoneCall, MessageCircle, Droplets } from 'lucide-react';
 import { Language, translations } from '../data/translations';
+import { AppCustomization } from '../data/customization';
+import { FreeServicesSection } from './FreeServicesSection';
 
 interface ServicesPageProps {
   onOpenCallModal: () => void;
   onOpenWhatsAppModal: () => void;
   lang: Language;
+  customData?: AppCustomization;
 }
 
-export function ServicesPage({ onOpenCallModal, onOpenWhatsAppModal, lang }: ServicesPageProps) {
+export function ServicesPage({
+  onOpenCallModal,
+  onOpenWhatsAppModal,
+  lang,
+  customData,
+}: ServicesPageProps) {
   const t = translations[lang];
 
   const detailedServices = [
@@ -56,7 +64,7 @@ export function ServicesPage({ onOpenCallModal, onOpenWhatsAppModal, lang }: Ser
   ];
 
   return (
-    <div className="space-y-4 pt-1 animate-fadeIn">
+    <div className="space-y-4 pt-1 animate-fadeIn pb-8">
       {/* Title */}
       <div className="text-center space-y-1">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-500/30 text-cyan-300 text-xs font-bold">
@@ -78,7 +86,7 @@ export function ServicesPage({ onOpenCallModal, onOpenWhatsAppModal, lang }: Ser
           return (
             <div
               key={service.id}
-              className="p-4 rounded-2xl bg-[#091122] border border-blue-500/30 shadow-[0_0_20px_rgba(0,102,255,0.15)] relative overflow-hidden"
+              className="p-4 rounded-2xl bg-[#091122] border border-blue-500/30 shadow-[0_0_20px_rgba(0,102,255,0.15)] relative overflow-hidden text-start"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
@@ -110,6 +118,9 @@ export function ServicesPage({ onOpenCallModal, onOpenWhatsAppModal, lang }: Ser
           );
         })}
       </div>
+
+      {/* Free Services & Materials Inclusions Banner */}
+      <FreeServicesSection lang={lang} items={customData?.freeServices} />
 
       {/* Quick Booking Contact Bar */}
       <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#09152b] to-[#070e1c] border border-cyan-400/40 flex items-center justify-between gap-2">

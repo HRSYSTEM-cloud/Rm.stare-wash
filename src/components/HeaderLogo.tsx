@@ -61,12 +61,12 @@ export function HeaderLogo({
   };
 
   return (
-    <header className="w-full max-w-md mx-auto px-4 pt-4 pb-2 text-center relative z-10 flex flex-col items-center">
+    <header className="w-full max-w-md mx-auto px-3 pt-2 pb-1 text-center relative z-10 flex flex-col items-center">
       {/* Top Utility Bar: Language Switcher */}
-      <div className="w-full flex items-center justify-end mb-2">
+      <div className="w-full flex items-center justify-end mb-1">
         <button
           onClick={onToggleLang}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-500/40 text-cyan-300 text-xs font-bold hover:bg-blue-900/80 hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,102,255,0.3)] active:scale-95"
+          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-950/70 border border-blue-500/40 text-cyan-300 text-[10px] font-bold hover:bg-blue-900/80 hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,102,255,0.25)] active:scale-95"
           title={lang === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'}
         >
           <span>🌐</span>
@@ -78,12 +78,14 @@ export function HeaderLogo({
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="relative mb-3 group"
+        transition={{ duration: 0.35 }}
+        className="relative mb-2.5 sm:mb-3 group"
       >
         <div
           onClick={handleLogoTap}
-          className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,140,255,0.4)] cursor-pointer select-none active:scale-[0.99] transition-transform"
+          className={`relative ${
+            compact ? 'w-16 h-16' : 'w-40 h-40 sm:w-44 sm:h-44'
+          } rounded-2xl overflow-hidden bg-black shadow-[0_0_30px_rgba(0,140,255,0.4)] cursor-pointer select-none active:scale-[0.98] transition-transform`}
           title={lang === 'ar' ? 'شعار مغسلة RM.STAR' : 'RM.STAR Logo'}
         >
           <img
@@ -102,74 +104,78 @@ export function HeaderLogo({
         </div>
 
         {/* 24/7 Verified Mini Badge */}
-        <motion.div
-          initial={{ y: 5, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#070c18] border border-cyan-400/60 shadow-[0_0_18px_rgba(0,150,255,0.7)] flex items-center gap-1.5 whitespace-nowrap"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span className="text-[11px] font-bold text-cyan-300 tracking-wide">{t.open247}</span>
-        </motion.div>
+        {!compact && (
+          <motion.div
+            initial={{ y: 5, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-[#070c18] border border-cyan-400/60 shadow-[0_0_15px_rgba(0,150,255,0.6)] flex items-center gap-1 whitespace-nowrap"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-[10px] font-bold text-cyan-300 tracking-wide">{t.open247}</span>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Main Titles */}
       <motion.div
-        initial={{ y: 15, opacity: 0 }}
+        initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15, duration: 0.5 }}
-        className="space-y-1 max-w-md mx-auto"
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="space-y-0.5 max-w-md mx-auto"
       >
-        <div className="inline-flex items-center justify-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-950/60 border border-blue-500/30 text-blue-300 text-xs font-semibold mb-0.5 shadow-[0_0_10px_rgba(0,102,255,0.2)]">
-          <span>🚘</span>
-          <span className="tracking-widest font-mono text-cyan-300">RM.STAR</span>
-          <span className="text-blue-400/60">|</span>
-          <span className="tracking-wide">STAR CAR WASH</span>
-        </div>
+        {!compact && (
+          <div className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full bg-blue-950/60 border border-blue-500/30 text-blue-300 text-[10px] font-semibold mb-0.5 shadow-sm">
+            <span>🚘</span>
+            <span className="tracking-widest font-mono text-cyan-300 font-bold">RM.STAR</span>
+            <span className="text-blue-400/60">|</span>
+            <span className="tracking-wide">STAR CAR WASH</span>
+          </div>
+        )}
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug drop-shadow-sm">
+        <h1 className={`${compact ? 'text-base font-bold' : 'text-lg sm:text-xl font-extrabold'} text-white tracking-tight leading-snug drop-shadow-sm`}>
           {lang === 'ar' ? (
-            <>مغسلة <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_15px_rgba(0,102,255,0.5)]">آر إم ستار</span> للسيارات</>
+            <>مغسلة <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_10px_rgba(0,102,255,0.4)]">آر إم ستار</span> للسيارات</>
           ) : (
-            <><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_15px_rgba(0,102,255,0.5)]">RM.STAR</span> Star Car Wash</>
+            <><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-blue-500 drop-shadow-[0_0_10px_rgba(0,102,255,0.4)]">RM.STAR</span> Star Car Wash</>
           )}
         </h1>
 
-        <p className="text-xs sm:text-sm font-medium text-cyan-200/90 flex items-center justify-center gap-1.5 pt-0.5">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400 inline shrink-0 animate-pulse" />
-          <span>{t.footerSlogan}</span>
-        </p>
-
-        <p className="text-xs text-slate-300/80 leading-relaxed pt-0.5">
-          {t.heroDesc}
-        </p>
+        {!compact && (
+          <p className="text-[11px] sm:text-xs font-semibold text-cyan-200/90 flex items-center justify-center gap-1 pt-0.5">
+            <Sparkles className="w-3 h-3 text-cyan-400 inline shrink-0 animate-pulse" />
+            <span>{t.footerSlogan}</span>
+          </p>
+        )}
       </motion.div>
 
       {/* Quick Status Bar */}
-      <motion.div
-        initial={{ y: 15, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}
-        className="mt-3 flex flex-wrap items-center justify-center gap-1.5 max-w-sm"
-      >
-        <button
-          onClick={handleBranchesClick}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0d1322] border border-blue-500/30 text-slate-200 text-[11px] hover:border-blue-400 hover:text-white transition-colors"
+      {!compact && (
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="mt-2 flex flex-wrap items-center justify-center gap-1.5 max-w-sm"
         >
-          <MapPin className="w-3.5 h-3.5 text-blue-400" />
-          <span>{lang === 'ar' ? 'جدة (فرعان)' : 'Jeddah (2 Branches)'}</span>
-        </button>
+          <button
+            onClick={handleBranchesClick}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0d1322] border border-blue-500/30 text-slate-200 text-[10px] font-medium hover:border-blue-400 hover:text-white transition-colors"
+          >
+            <MapPin className="w-3 h-3 text-blue-400 shrink-0" />
+            <span>{lang === 'ar' ? 'جدة (فرعان)' : 'Jeddah (2 Branches)'}</span>
+          </button>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0d1322] border border-blue-500/30 text-slate-200 text-[11px]">
-          <Clock className="w-3.5 h-3.5 text-cyan-400" />
-          <span>{lang === 'ar' ? 'خدمة متواصلة 24 ساعة' : '24/7 Non-stop Service'}</span>
-        </div>
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0d1322] border border-blue-500/30 text-slate-200 text-[10px] font-medium">
+            <Clock className="w-3 h-3 text-cyan-400 shrink-0" />
+            <span>{lang === 'ar' ? 'خدمة متواصلة 24 ساعة' : '24/7 Non-stop'}</span>
+          </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0d1322] border border-blue-500/30 text-slate-200 text-[11px]">
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-          <span>{lang === 'ar' ? 'دقة واهتمام بالتفاصيل' : 'Mastering Every Detail'}</span>
-        </div>
-      </motion.div>
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0d1322] border border-blue-500/30 text-slate-200 text-[10px] font-medium">
+            <ShieldCheck className="w-3 h-3 text-blue-400 shrink-0" />
+            <span>{lang === 'ar' ? 'دقة واهتمام بالتفاصيل' : 'Attention to Details'}</span>
+          </div>
+        </motion.div>
+      )}
     </header>
   );
 }

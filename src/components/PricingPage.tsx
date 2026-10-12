@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { DEFAULT_PRICING_DATA, PriceItem, BranchPricing } from '../data/pricing';
 import { Language, translations } from '../data/translations';
-import { Tag, Sparkles, CheckCircle2, ShieldAlert, Car, Droplets } from 'lucide-react';
+import { Tag, Sparkles, CheckCircle2, ShieldAlert, Car, Droplets, CreditCard, Banknote } from 'lucide-react';
 import { AppCustomization } from '../data/customization';
+import { OffersSection } from './OffersSection';
+import { FreeServicesSection } from './FreeServicesSection';
 
 interface PricingPageProps {
   lang: Language;
@@ -71,6 +73,11 @@ export function PricingPage({ lang, customData }: PricingPageProps) {
           {activePricing.noteAr}
         </p>
       </div>
+
+      {/* Dynamic Offers in Prices Page */}
+      {customData?.offers && customData.offers.length > 0 && (
+        <OffersSection offers={customData.offers} lang={lang} />
+      )}
 
       {/* Branch Selector Switch */}
       <div className="p-1 rounded-2xl bg-[#070b16] border border-cyan-400/30 flex items-center justify-between gap-1 shadow-md">
@@ -160,18 +167,18 @@ export function PricingPage({ lang, customData }: PricingPageProps) {
                     : 'bg-[#080d1c] border-blue-900/40 hover:border-blue-500/40'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-white">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 mb-2.5 pb-2 border-b border-white/10">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-black text-white tracking-wide">
                       {service.nameAr}
                     </span>
                     {isHighlight && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-400 text-black">
-                        الأكثر طلباً
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-400 text-black shadow-sm shrink-0">
+                        الأكثر طلباً ⭐
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono">
+                  <span className="text-[11px] text-cyan-200/70 font-mono tracking-tight shrink-0">
                     {service.nameEn}
                   </span>
                 </div>
@@ -252,6 +259,26 @@ export function PricingPage({ lang, customData }: PricingPageProps) {
           </div>
         </div>
       )}
+
+      {/* Free Services & Quality Materials */}
+      <FreeServicesSection lang={lang} items={customData?.freeServices} />
+
+      {/* Accepted Payment Methods Strip (طرق الدفع: كاش • شبكة) */}
+      <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#081122]/90 border border-blue-500/25 shadow-sm">
+        <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-300">
+          <CreditCard className="w-3.5 h-3.5 text-cyan-400" />
+          <span>{lang === 'ar' ? 'طرق الدفع في الفرعين:' : 'Payment Methods:'}</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-bold">
+          <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-200">
+            {lang === 'ar' ? 'كاش' : 'Cash'}
+          </span>
+          <span className="text-slate-500 text-[10px]">•</span>
+          <span className="px-2.5 py-0.5 rounded-md bg-cyan-950/50 border border-cyan-500/30 text-cyan-300">
+            {lang === 'ar' ? 'شبكة' : 'POS'}
+          </span>
+        </div>
+      </div>
 
       {/* Transparency & Quality Notice */}
       <div className="p-3 rounded-xl bg-[#091122] border border-blue-900/40 text-[11px] text-slate-300 flex items-start gap-2">
