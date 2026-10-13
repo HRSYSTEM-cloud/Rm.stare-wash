@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
 import { AnimatedBackground } from './components/AnimatedBackground';
-import { HeaderLogo } from './components/HeaderLogo';
-import { ActionButtons } from './components/ActionButtons';
-import { BranchesSection } from './components/BranchesSection';
-import { PricingPage } from './components/PricingPage';
-import { ServicesPage } from './components/ServicesPage';
-import { GalleryPage } from './components/GalleryPage';
-import { LinksPage } from './components/LinksPage';
-import { GoogleReviewsPage } from './components/GoogleReviewsPage';
-import { CompetitionsPage } from './components/CompetitionsPage';
-import { BottomNavigation, PageTab } from './components/BottomNavigation';
-import { BrandFooter } from './components/BrandFooter';
+import { LuxuryNavbar } from './components/LuxuryNavbar';
+import { LuxuryHero } from './components/LuxuryHero';
+import { LuxuryPricing } from './components/LuxuryPricing';
+import { LuxuryFeatures } from './components/LuxuryFeatures';
+import { LuxuryBranches } from './components/LuxuryBranches';
+import { LuxuryGallery } from './components/LuxuryGallery';
+import { LuxuryReviews } from './components/LuxuryReviews';
+import { LuxurySocials } from './components/LuxurySocials';
+import { LuxuryFooter } from './components/LuxuryFooter';
 import { CallModal } from './components/CallModal';
 import { WhatsAppModal } from './components/WhatsAppModal';
-import { ShareModal } from './components/ShareModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { Language, translations } from './data/translations';
 import {
@@ -24,11 +21,9 @@ import {
 } from './data/customization';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<PageTab>('home');
   const [lang, setLang] = useState<Language>('ar');
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
-  const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   // Dynamic Customization synchronized with Firebase & LocalStorage
@@ -62,9 +57,22 @@ export default function App() {
     setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
   };
 
-  const handleTabChange = (tab: PageTab) => {
-    setCurrentTab(tab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToPricing = () => {
+    const el = document.getElementById('pricing');
+    if (el) {
+      const yOffset = -80;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToBranches = () => {
+    const el = document.getElementById('branches');
+    if (el) {
+      const yOffset = -80;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
   };
 
   // Sync document title with language
@@ -79,123 +87,86 @@ export default function App() {
     <div
       dir={lang === 'ar' ? 'rtl' : 'ltr'}
       className={`min-h-screen bg-[#05070c] text-white selection:bg-[#0066ff] selection:text-white relative overflow-x-hidden ${
-        lang === 'ar' ? "font-['Cairo',sans-serif]" : 'font-sans'
-      } pb-[max(96px,calc(env(safe-area-inset-bottom)+76px))]`}
+        lang === 'ar' ? "font-['Alexandria',sans-serif]" : 'font-sans'
+      }`}
     >
-      {/* Deep Solid Luxury Dark Background with Custom Wallpaper support */}
+      {/* Background Graphic & Wallpaper support */}
       <AnimatedBackground
         backgroundImageUrl={customData.backgroundImageUrl}
         overlayOpacity={customData.backgroundOverlayOpacity}
       />
 
-      {/* Main Container - Optimized for mobile viewports (100% Mobile First) */}
-      <main className="relative z-10 w-full max-w-md mx-auto px-3 sm:px-4 py-2 flex flex-col justify-between min-h-screen">
-        <div className="space-y-3">
-          {/* Header & Logo with 100% STEALTH 5-Tap Secret Admin Trigger */}
-          <HeaderLogo
-            compact={currentTab !== 'home'}
-            onGoToBranches={() => handleTabChange('branches')}
+      {/* Top Glassmorphism Luxury Navbar */}
+      <LuxuryNavbar
+        lang={lang}
+        onToggleLang={toggleLanguage}
+        customData={customData}
+        onOpenCallModal={() => setIsCallModalOpen(true)}
+        onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
+        onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
+      />
+
+      {/* Main Single Page Content Flow */}
+      <main className="relative z-10 w-full">
+        {/* 1. Hero Section */}
+        <LuxuryHero
+          lang={lang}
+          customData={customData}
+          onScrollToPricing={scrollToPricing}
+          onScrollToBranches={scrollToBranches}
+          onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
+          onOpenCallModal={() => setIsCallModalOpen(true)}
+        />
+
+        {/* 2. Interactive Services & Pricing */}
+        <LuxuryPricing
+          lang={lang}
+          customData={customData}
+          onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
+        />
+
+        {/* 3. Features & Loyalty Card Tracker */}
+        <LuxuryFeatures
+          lang={lang}
+          customData={customData}
+        />
+
+        {/* 4. Branches & Google Maps Locations */}
+        <LuxuryBranches
+          lang={lang}
+          customData={customData}
+          onOpenCallModal={() => setIsCallModalOpen(true)}
+          onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
+        />
+
+        {/* 5. Real Gallery (Images & Videos) */}
+        {customData.showGalleryTab !== false && (
+          <LuxuryGallery
             lang={lang}
-            onToggleLang={toggleLanguage}
-            customLogoUrl={customData.logoUrl}
-            onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
+            items={customData.galleryItems}
           />
+        )}
 
-          {/* PAGE 1: HOME */}
-          {currentTab === 'home' && (
-            <div className="space-y-3 animate-fadeIn">
-              <ActionButtons
-                lang={lang}
-                customData={customData}
-                onGoToBranches={() => handleTabChange('branches')}
-                onGoToPrices={() => handleTabChange('prices')}
-                onGoToLinks={() => handleTabChange('links')}
-                onGoToReviews={() => handleTabChange('reviews')}
-                onGoToCompetitions={() => handleTabChange('competitions')}
-                onGoToGallery={() => handleTabChange('gallery')}
-                onOpenCallModal={() => setIsCallModalOpen(true)}
-                onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
-                onOpenLinksModal={() => setIsLinksModalOpen(true)}
-              />
-            </div>
-          )}
+        {/* 6. Google Reviews & Testimonials */}
+        {customData.showReviewsTab !== false && (
+          <LuxuryReviews
+            lang={lang}
+            customData={customData}
+          />
+        )}
 
-          {/* PAGE 2: PRICING */}
-          {currentTab === 'prices' && (
-            <div className="animate-fadeIn">
-              <PricingPage lang={lang} customData={customData} />
-            </div>
-          )}
-
-          {/* PAGE 3: BRANCHES */}
-          {currentTab === 'branches' && (
-            <div className="animate-fadeIn">
-              <BranchesSection lang={lang} customData={customData} />
-            </div>
-          )}
-
-          {/* PAGE 4: SERVICES */}
-          {currentTab === 'services' && (
-            <div className="animate-fadeIn">
-              <ServicesPage
-                lang={lang}
-                customData={customData}
-                onOpenCallModal={() => setIsCallModalOpen(true)}
-                onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
-              />
-            </div>
-          )}
-
-          {/* PAGE 5: GALLERY (المعرض: صور وفيديوهات) */}
-          {currentTab === 'gallery' && customData.showGalleryTab !== false && (
-            <div className="animate-fadeIn">
-              <GalleryPage lang={lang} items={customData.galleryItems} />
-            </div>
-          )}
-
-          {/* PAGE 6: COMPETITIONS */}
-          {currentTab === 'competitions' && customData.showCompetitionsTab !== false && (
-            <div className="animate-fadeIn">
-              <CompetitionsPage
-                lang={lang}
-                customData={customData}
-                onOpenWhatsAppModal={() => setIsWhatsAppModalOpen(true)}
-                onGoToPrices={() => handleTabChange('prices')}
-              />
-            </div>
-          )}
-
-          {/* PAGE 7: GOOGLE REVIEWS */}
-          {currentTab === 'reviews' && customData.showReviewsTab !== false && (
-            <div className="animate-fadeIn">
-              <GoogleReviewsPage
-                lang={lang}
-                customData={customData}
-                onOpenAdmin={() => setIsAdminModalOpen(true)}
-              />
-            </div>
-          )}
-
-          {/* PAGE 8: LINKS */}
-          {currentTab === 'links' && (
-            <div className="animate-fadeIn">
-              <LinksPage customData={customData} />
-            </div>
-          )}
-        </div>
-
-        {/* Footer with Dynamic Contact Numbers */}
-        <BrandFooter lang={lang} customData={customData} />
+        {/* 7. Social Links & Accounts */}
+        <LuxurySocials
+          lang={lang}
+          customData={customData}
+        />
       </main>
 
-      {/* Modern Bottom Navigation Bar */}
-      <BottomNavigation
-        currentTab={currentTab}
-        onTabChange={handleTabChange}
+      {/* Official Luxury Footer */}
+      <LuxuryFooter
         lang={lang}
-        showReviewsTab={customData.showReviewsTab !== false}
-        showCompetitionsTab={customData.showCompetitionsTab !== false}
-        showGalleryTab={customData.showGalleryTab !== false}
+        customData={customData}
+        onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
       />
 
       {/* Modals */}
@@ -213,13 +184,7 @@ export default function App() {
         customData={customData}
       />
 
-      <ShareModal
-        isOpen={isLinksModalOpen}
-        onClose={() => setIsLinksModalOpen(false)}
-        lang={lang}
-      />
-
-      {/* Admin Dashboard Modal */}
+      {/* Admin Dashboard Modal (Activated via 5-tap on logo) */}
       <AdminDashboardModal
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
