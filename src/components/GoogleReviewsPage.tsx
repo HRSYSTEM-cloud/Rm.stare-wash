@@ -40,9 +40,18 @@ export function GoogleReviewsPage({ lang, customData, onOpenAdmin }: GoogleRevie
     DEFAULT_QURAYNIYYAH_ELFSIGHT_ID
   );
 
-  // Ensure Elfsight script runs and detects the widgets
+  // Dynamically load Elfsight script on demand only when on the Reviews page
   useEffect(() => {
-    // If eapps platform is ready, trigger initialization
+    const hasWidget = isValidElfsightId(rabwahWidgetId) || isValidElfsightId(qurayniyyahWidgetId);
+    if (!hasWidget) return;
+
+    if (!document.querySelector('script[src*="elfsightcdn.com/platform.js"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://elfsightcdn.com/platform.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
     const w = window as unknown as { eapps?: { platform?: { initialize?: () => void } } };
     if (w.eapps?.platform?.initialize) {
       try {
@@ -51,7 +60,7 @@ export function GoogleReviewsPage({ lang, customData, onOpenAdmin }: GoogleRevie
         console.warn('Elfsight init:', err);
       }
     }
-  }, [activeBranch]);
+  }, [activeBranch, rabwahWidgetId, qurayniyyahWidgetId]);
 
   return (
     <div className="space-y-4 pt-1 animate-fadeIn pb-8 text-start">

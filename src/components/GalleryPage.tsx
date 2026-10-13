@@ -105,7 +105,7 @@ export function GalleryPage({ lang, items }: GalleryPageProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {filteredItems.map((item, index) => {
             const isVideo = item.type === 'video';
-            const displayThumb = item.thumbnailUrl || item.url;
+            const hasValidImage = item.thumbnailUrl || (!isVideo && item.url);
 
             return (
               <motion.div
@@ -117,13 +117,20 @@ export function GalleryPage({ lang, items }: GalleryPageProps) {
                 className="group relative cursor-pointer overflow-hidden rounded-2xl bg-[#091124] border border-blue-900/40 hover:border-cyan-400/60 shadow-md hover:shadow-[0_0_20px_rgba(0,180,255,0.25)] transition-all flex flex-col justify-between"
               >
                 {/* Media Image / Thumbnail */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/80">
-                  <img
-                    src={displayThumb}
-                    alt={item.titleAr}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-black/80 flex items-center justify-center">
+                  {hasValidImage ? (
+                    <img
+                      src={item.thumbnailUrl || item.url}
+                      alt={item.titleAr}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#0c1936] via-[#071126] to-[#040814] flex flex-col items-center justify-center p-4">
+                      <Film className="w-10 h-10 text-cyan-400/60 mb-1" />
+                      <span className="text-[10px] text-cyan-300 font-bold opacity-80">RM.STAR VIDEO</span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
 
                   {/* Top Badge: Photo or Video */}
@@ -208,7 +215,8 @@ export function GalleryPage({ lang, items }: GalleryPageProps) {
                   selectedMedia.url.endsWith('.mp4') ||
                   selectedMedia.url.endsWith('.webm') ||
                   selectedMedia.url.endsWith('.mov') ||
-                  selectedMedia.url.includes('.mp4?') ? (
+                  selectedMedia.url.includes('.mp4?') ||
+                  selectedMedia.url.includes('imgur.com') ? (
                     <video
                       src={selectedMedia.url}
                       controls

@@ -30,7 +30,14 @@ import {
   Layers,
   FlaskConical,
   Package,
+  Loader2,
 } from 'lucide-react';
+import {
+  compressImageFile,
+  extractVideoThumbnail,
+  uploadVideoToCloud,
+  uploadImageToCloud,
+} from '../utils/mediaUpload';
 import {
   AppCustomization,
   AppOffer,
@@ -133,6 +140,9 @@ export function AdminDashboardModal({
   const [galleryItems, setGalleryItems] = useState<GalleryMediaItem[]>(
     currentData.galleryItems || DEFAULT_GALLERY_ITEMS
   );
+  const [uploadingGalleryIndex, setUploadingGalleryIndex] = useState<number | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadStatusMsg, setUploadStatusMsg] = useState<string>('');
 
   // Contacts Form
   const [rabwahPhone, setRabwahPhone] = useState(
@@ -328,45 +338,28 @@ export function AdminDashboardModal({
     }
   };
 
-  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert(
-        lang === 'ar'
-          ? 'حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 5 ميجابايت'
-          : 'Image too large. Please select an image under 5MB.'
-      );
-      return;
+    try {
+      const compressed = await compressImageFile(file, 900, 900, 0.82);
+      setLogoUrl(compressed);
+    } catch {
+      alert(lang === 'ar' ? 'فشل معالجة الصورة، يرجى اختيار صورة أخرى' : 'Failed to process image');
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const src = event.target?.result as string;
-      if (!src) return;
-      setLogoUrl(src);
-    };
-    reader.readAsDataURL(file);
   };
 
-  const handleBgFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBgFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert(
-        lang === 'ar'
-          ? 'حجم الصورة كبير، يرجى اختيار ملف أقل من 5 ميجابايت'
-          : 'Image too large. Under 5MB required.'
-      );
-      return;
+
+    try {
+      const compressed = await compressImageFile(file, 1280, 1280, 0.8);
+      setBackgroundImageUrl(compressed);
+    } catch {
+      alert(lang === 'ar' ? 'فشل معالجة صورة الخلفية' : 'Failed to process wallpaper');
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const src = event.target?.result as string;
-      if (src) setBackgroundImageUrl(src);
-    };
-    reader.readAsDataURL(file);
   };
 
   // Pricing handlers
@@ -454,62 +447,105 @@ export function AdminDashboardModal({
     setGalleryItems(next);
   };
 
-  const handleGalleryFileUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const isVideo = file.type.startsWith('video/');
-    const isImage = file.type.startsWith('image/');
 
-    // Check size (allow up to 25MB for video, 8MB for image)
-    const maxSize = isVideo ? 25 * 1024 * 1024 : 8 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert(
-        lang === 'ar'
-          ? `حجم الملف كبير، الحد الأقصى هو ${isVideo ? '25' : '8'} ميجابايت`
-          : `File too large. Max size is ${isVideo ? '25MB' : '8MB'}`
-      );
-      return;
+    if (isVideo) {
+      if (file.size > 80 * 1024 * 1024) {
+        alert(
+          lang === 'ar'
+            ? 'حجم الفيديو كبير جداً (الحد الأقصى 80 ميجابايت). يرجى اختيار مقطع أقصر.'
+            : 'Video too large (>80MB). Please select a shorter video.'
+        );
+        return;
+      }
+
+      setUploadingGalleryIndex(index);
+      setUploadProgress(5);
+      setUploadStatusMsg(lang === 'ar' ? 'جاري تجهيز الفيديو واستخراج الغلاف...' : 'Preparing video & thumbnail...');
+
+      try {
+        // 1. Extract high quality thumbnail frame automatically
+        const extractedThumb = await extractVideoThumbnail(file);
+
+        // 2. Upload video file to high-speed cloud CDN
+        setUploadStatusMsg(lang === 'ar' ? 'جاري رفع الفيديو وحفظه في السحاب...' : 'Uploading video to cloud...');
+        const cloudVideoUrl = await uploadVideoToCloud(file, (percent) => {
+          setUploadProgress(percent);
+        });
+
+        const next = [...galleryItems];
+        next[index] = {
+          ...next[index],
+          url: cloudVideoUrl,
+          thumbnailUrl: extractedThumb || next[index].thumbnailUrl || '',
+          type: 'video',
+        };
+        setGalleryItems(next);
+        setUploadProgress(100);
+        setUploadStatusMsg(lang === 'ar' ? '✅ تم رفع الفيديو بنجاح وجاهز للعرض!' : '✅ Video uploaded successfully!');
+      } catch (err: any) {
+        console.error('Video upload error:', err);
+        alert(
+          lang === 'ar'
+            ? `تعذر رفع الفيديو: ${err?.message || 'خطأ في الاتصال'}. يمكنك تجربة مقطع آخر أو وضع رابط مباشر.`
+            : `Failed to upload video: ${err?.message || 'Network error'}`
+        );
+      } finally {
+        setTimeout(() => {
+          setUploadingGalleryIndex(null);
+          setUploadProgress(0);
+          setUploadStatusMsg('');
+        }, 1500);
+      }
+    } else {
+      // Photo upload
+      setUploadingGalleryIndex(index);
+      setUploadProgress(40);
+      setUploadStatusMsg(lang === 'ar' ? 'جاري معالجة وضغط الصورة...' : 'Optimizing photo...');
+
+      try {
+        const optimizedPhoto = await uploadImageToCloud(file);
+        const next = [...galleryItems];
+        next[index] = {
+          ...next[index],
+          url: optimizedPhoto,
+          thumbnailUrl: optimizedPhoto,
+          type: 'image',
+        };
+        setGalleryItems(next);
+        setUploadProgress(100);
+        setUploadStatusMsg(lang === 'ar' ? '✅ تم حفظ الصورة بنجاح!' : '✅ Photo saved successfully!');
+      } catch (err) {
+        alert(lang === 'ar' ? 'فشل معالجة الصورة، يرجى تجربة صورة أخرى' : 'Failed to process image');
+      } finally {
+        setTimeout(() => {
+          setUploadingGalleryIndex(null);
+          setUploadProgress(0);
+          setUploadStatusMsg('');
+        }, 800);
+      }
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const src = event.target?.result as string;
-      if (!src) return;
-
-      const next = [...galleryItems];
-      next[index] = {
-        ...next[index],
-        url: src,
-        type: isVideo ? 'video' : 'image',
-      };
-      setGalleryItems(next);
-    };
-    reader.readAsDataURL(file);
   };
 
-  const handleGalleryThumbUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryThumbUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert(lang === 'ar' ? 'حجم الصورة المصغرة كبير (الحد 5 ميجابايت)' : 'Thumbnail too large (Max 5MB)');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const src = event.target?.result as string;
-      if (!src) return;
-
+    try {
+      const compressedThumb = await compressImageFile(file, 640, 640, 0.8);
       const next = [...galleryItems];
       next[index] = {
         ...next[index],
-        thumbnailUrl: src,
+        thumbnailUrl: compressedThumb,
       };
       setGalleryItems(next);
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      alert(lang === 'ar' ? 'فشل معالجة صورة الغلاف' : 'Failed to process thumbnail');
+    }
   };
 
   // Competitions handlers
@@ -644,6 +680,15 @@ export function AdminDashboardModal({
       showGalleryTab,
       galleryItems,
     };
+    if (uploadingGalleryIndex !== null) {
+      alert(
+        lang === 'ar'
+          ? 'يرجى الانتظار حتى يكتمل رفع وحفظ المقطع في السحاب أولاً'
+          : 'Please wait for upload to finish first'
+      );
+      return;
+    }
+
     try {
       await saveCloudCustomization(updated);
       onSave(updated);
@@ -651,8 +696,13 @@ export function AdminDashboardModal({
       setTimeout(() => {
         setSavedSuccess(false);
       }, 2500);
-    } catch (e) {
-      alert(lang === 'ar' ? 'حدث خطأ أثناء الحفظ في السحاب' : 'Failed to save to cloud');
+    } catch (e: any) {
+      console.error('Failed to save to cloud:', e);
+      alert(
+        lang === 'ar'
+          ? `حدث خطأ أثناء الحفظ في السحاب: ${e?.message || 'يرجى التحقق من الاتصال بالإنترنت'}`
+          : `Failed to save to cloud: ${e?.message || 'Check internet connection'}`
+      );
     } finally {
       setIsSaving(false);
     }
@@ -1453,26 +1503,47 @@ export function AdminDashboardModal({
                           <div className="space-y-1">
                             <label className="text-[10px] text-slate-400 block mb-0.5 font-bold">
                               {lang === 'ar'
-                                ? 'رابط الوسائط (أو ارفع مباشرة من الجوال/الكمبيوتر):'
+                                ? 'رابط الوسائط (أو ارفع مباشرة من معرض الجوال/الكمبيوتر):'
                                 : 'Media URL or Direct File Upload:'}
                             </label>
 
                             <div className="flex items-center gap-1.5">
                               {/* Direct File Upload from Mobile Gallery / Camera / PC */}
-                              <label className="cursor-pointer px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-[11px] flex items-center gap-1 shadow-sm transition-all shrink-0">
-                                <Upload className="w-3.5 h-3.5 text-black" />
-                                <span>{lang === 'ar' ? 'رفع من الجوال / PC' : 'Upload File'}</span>
+                              <label
+                                className={`cursor-pointer px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-[11px] flex items-center gap-1 shadow-sm transition-all shrink-0 ${
+                                  uploadingGalleryIndex === index ? 'opacity-50 pointer-events-none' : ''
+                                }`}
+                              >
+                                {uploadingGalleryIndex === index ? (
+                                  <Loader2 className="w-3.5 h-3.5 text-black animate-spin" />
+                                ) : (
+                                  <Upload className="w-3.5 h-3.5 text-black" />
+                                )}
+                                <span>
+                                  {uploadingGalleryIndex === index
+                                    ? lang === 'ar'
+                                      ? 'جاري الرفع...'
+                                      : 'Uploading...'
+                                    : item.type === 'video'
+                                    ? lang === 'ar'
+                                      ? 'رفع فيديو'
+                                      : 'Upload Video'
+                                    : lang === 'ar'
+                                    ? 'رفع صورة'
+                                    : 'Upload Photo'}
+                                </span>
                                 <input
                                   type="file"
                                   accept={item.type === 'video' ? 'video/*' : 'image/*'}
                                   className="hidden"
+                                  disabled={uploadingGalleryIndex !== null}
                                   onChange={(e) => handleGalleryFileUpload(index, e)}
                                 />
                               </label>
 
                               <input
                                 type="text"
-                                value={item.url.startsWith('data:') ? (lang === 'ar' ? '✅ تم رفع الملف بنجاح من جهازك' : '✅ Uploaded from device') : item.url}
+                                value={item.url.startsWith('data:') ? (lang === 'ar' ? '✅ تم حفظ الملف بنجاح' : '✅ Uploaded from device') : item.url}
                                 onChange={(e) =>
                                   handleGalleryItemChange(index, 'url', e.target.value)
                                 }
@@ -1480,6 +1551,27 @@ export function AdminDashboardModal({
                                 className="flex-1 px-2.5 py-1.5 rounded bg-black border border-slate-700 text-cyan-300 font-mono text-xs focus:outline-none focus:border-cyan-400"
                               />
                             </div>
+
+                            {/* Active Upload Progress Status */}
+                            {uploadingGalleryIndex === index && (
+                              <div className="p-2 rounded-lg bg-blue-950/80 border border-cyan-500/40 space-y-1 animate-pulse">
+                                <div className="flex items-center justify-between text-[10px] text-cyan-300 font-bold">
+                                  <div className="flex items-center gap-1">
+                                    <Loader2 className="w-3 h-3 animate-spin text-cyan-400" />
+                                    <span>{uploadStatusMsg}</span>
+                                  </div>
+                                  {uploadProgress > 0 && <span>{uploadProgress}%</span>}
+                                </div>
+                                {uploadProgress > 0 && (
+                                  <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden">
+                                    <div
+                                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-300"
+                                      style={{ width: `${uploadProgress}%` }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1487,7 +1579,7 @@ export function AdminDashboardModal({
                         {item.url && (
                           <div className="relative w-full h-24 rounded-lg overflow-hidden bg-black/90 border border-slate-800 flex items-center justify-center">
                             {item.type === 'video' ? (
-                              item.url.startsWith('data:video') || item.url.endsWith('.mp4') ? (
+                              item.url.startsWith('data:video') || item.url.includes('.mp4') || item.url.includes('imgur.com') ? (
                                 <video
                                   src={item.url}
                                   className="w-full h-full object-contain"

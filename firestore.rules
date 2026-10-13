@@ -4,12 +4,12 @@ service cloud.firestore {
     // RM.STAR Settings & Customization rules
     // Allow public read so visitors see current logo & active promos
     // Allow write to settings document
-    match /settings/{document=**} {
-      allow read: if true;
-      allow write: if true;
+    match /settings/{docId} {
+      allow read, write: if true;
     }
-
-    // Default deny for any other document paths
+    match /settings/{docId}/{allSubcollections=**} {
+      allow read, write: if true;
+    }
     match /{document=**} {
       allow read, write: if false;
     }

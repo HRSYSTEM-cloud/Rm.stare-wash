@@ -24,7 +24,6 @@ export function BrandFooter({ lang, customData }: BrandFooterProps) {
           timeZone: 'Asia/Riyadh',
           hour: '2-digit',
           minute: '2-digit',
-          second: '2-digit',
           hour12: true,
         });
         setJeddahTime(formatter.format(now));
@@ -33,7 +32,7 @@ export function BrandFooter({ lang, customData }: BrandFooterProps) {
       }
     };
     updateTime();
-    const interval = setInterval(updateTime, 1000);
+    const interval = setInterval(updateTime, 30000);
     return () => clearInterval(interval);
   }, [lang]);
 

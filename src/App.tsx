@@ -35,17 +35,27 @@ export default function App() {
   const [customData, setCustomData] = useState<AppCustomization>(getLocalStoredCustomization());
 
   useEffect(() => {
-    // 1. Initial fetch from Firestore
-    fetchCloudCustomization().then((data) => {
-      if (data) setCustomData(data);
-    });
+    let hasReceivedRealtime = false;
 
-    // 2. Real-time subscription to Firestore
+    // Real-time listener for Firestore changes across all devices
     const unsubscribe = subscribeToCustomization((cloudData) => {
+      hasReceivedRealtime = true;
       setCustomData(cloudData);
     });
 
-    return () => unsubscribe();
+    // Fallback single fetch only if real-time listener doesn't respond
+    const timer = setTimeout(() => {
+      if (!hasReceivedRealtime) {
+        fetchCloudCustomization().then((data) => {
+          if (data) setCustomData(data);
+        });
+      }
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   const toggleLanguage = () => {

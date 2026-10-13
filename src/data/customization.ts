@@ -429,9 +429,18 @@ export function getLocalStoredCustomization(): AppCustomization {
 
 export function saveLocalStoredCustomization(data: AppCustomization): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    // Keep local cache lightweight for maximum initial load performance
+    const lightweight = {
+      ...data,
+      galleryItems: (data.galleryItems || []).map((item) => ({
+        ...item,
+        // If an item accidentally had a massive base64 payload, don't bloat localStorage
+        url: item.url?.startsWith('data:') && item.url.length > 250000 ? '' : item.url,
+      })),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
   } catch (e) {
-    console.error('Failed to save local custom data', e);
+    console.warn('LocalStorage save skipped (quota protection):', e);
   }
 }
 
