@@ -7,7 +7,6 @@ import { LuxuryFeatures } from './components/LuxuryFeatures';
 import { LuxuryBranches } from './components/LuxuryBranches';
 import { LuxuryGallery } from './components/LuxuryGallery';
 import { LuxuryReviews } from './components/LuxuryReviews';
-import { LuxurySocials } from './components/LuxurySocials';
 import { LuxuryFooter } from './components/LuxuryFooter';
 import { CallModal } from './components/CallModal';
 import { WhatsAppModal } from './components/WhatsAppModal';
@@ -155,19 +154,13 @@ export default function App() {
           />
         )}
 
-        {/* 7. Social Links & Accounts */}
-        <LuxurySocials
+        {/* 7. Official Luxury Footer (Integrated Social Channels, Brand Info, Branches & Copyright) */}
+        <LuxuryFooter
           lang={lang}
           customData={customData}
+          onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
         />
       </main>
-
-      {/* Official Luxury Footer */}
-      <LuxuryFooter
-        lang={lang}
-        customData={customData}
-        onTriggerSecretAdmin={() => setIsAdminModalOpen(true)}
-      />
 
       {/* Modals */}
       <CallModal
