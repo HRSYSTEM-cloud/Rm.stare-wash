@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { ArrowUp, Clock } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import { Language, translations } from '../data/translations';
 import { AppCustomization } from '../data/customization';
 import { getDynamicBranches } from '../data/branches';
@@ -10,31 +9,10 @@ interface BrandFooterProps {
 }
 
 export function BrandFooter({ lang, customData }: BrandFooterProps) {
-  const [jeddahTime, setJeddahTime] = useState('');
   const t = translations[lang];
   const branches = getDynamicBranches(customData);
   const rabwah = branches.find((b) => b.id === 'al-rabwah') || branches[0];
   const qurayniyyah = branches.find((b) => b.id === 'al-qurayniyyah') || branches[1];
-
-  useEffect(() => {
-    const updateTime = () => {
-      try {
-        const now = new Date();
-        const formatter = new Intl.DateTimeFormat(lang === 'ar' ? 'ar-SA' : 'en-US', {
-          timeZone: 'Asia/Riyadh',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true,
-        });
-        setJeddahTime(formatter.format(now));
-      } catch {
-        setJeddahTime('');
-      }
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 30000);
-    return () => clearInterval(interval);
-  }, [lang]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -72,14 +50,6 @@ export function BrandFooter({ lang, customData }: BrandFooterProps) {
         </div>
       </div>
 
-      {/* Live Jeddah Clock */}
-      {jeddahTime && (
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#080f20] border border-cyan-400/20 text-slate-400 text-[11px]">
-          <Clock className="w-3 h-3 text-cyan-400 animate-pulse" />
-          <span>{t.localTime}: </span>
-          <span className="font-mono text-cyan-300 font-bold">{jeddahTime}</span>
-        </div>
-      )}
 
       {/* Branches Quick Directory with Dynamic Numbers */}
       <div className="text-[11px] text-slate-400 leading-relaxed border-t border-blue-900/20 pt-2.5">
