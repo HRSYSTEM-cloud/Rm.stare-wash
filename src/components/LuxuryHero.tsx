@@ -88,7 +88,6 @@ export function LuxuryHero({
             className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-blue-700 text-white font-['Alexandria',sans-serif] font-bold text-sm shadow-[0_4px_25px_rgba(6,182,212,0.35)] hover:shadow-[0_4px_30px_rgba(6,182,212,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <span>💰 {lang === 'ar' ? 'الخدمات والأسعار المعتمدة' : 'View Services & Pricing'}</span>
-            <ArrowDown className="w-4 h-4 animate-bounce" />
           </button>
 
           <button
@@ -96,7 +95,7 @@ export function LuxuryHero({
             className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900/90 border border-cyan-400/30 text-cyan-300 font-['Alexandria',sans-serif] font-bold text-sm hover:bg-cyan-950/40 hover:border-cyan-400/60 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <MapPin className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'مواقع الفروع على الخريطة' : 'Branches & Locations'}</span>
+            <span>{lang === 'ar' ? 'فروعنا ومواقع الخريطة' : 'Branches & Locations'}</span>
           </button>
         </div>
 

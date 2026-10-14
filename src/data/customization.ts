@@ -257,18 +257,19 @@ export const DEFAULT_FREE_SERVICES: FreeServiceItem[] = [
 ];
 
 export const DEFAULT_GALLERY_ITEMS: GalleryMediaItem[] = [
+  // --- 1. Photo Items ---
   {
-    id: 'gal-1',
+    id: 'photo-1',
     type: 'image',
     url: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1200&q=80',
     titleAr: 'رغوة شامبو لايف لاينز الكثيفة',
-    titleEn: 'Lifelines Snow Foam Wash',
-    descAr: 'تغطية كاملة للسيارة برغوة نانو شامبو لايف لاينز لتفكيك الأوساخ وحماية الطلاء.',
-    descEn: 'Full vehicle coverage with Lifelines snow foam protecting paintwork.',
+    titleEn: 'Lifelines Snow Foam Active Wash',
+    descAr: 'تغطية متكاملة برغوة نانو ثلجية نشطة تفكك الأوساخ بدون خدش الطلاء.',
+    descEn: 'Full vehicle coverage with dense active foam protecting clear coat.',
     category: 'wash',
   },
   {
-    id: 'gal-2',
+    id: 'photo-2',
     type: 'image',
     url: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=1200&q=80',
     titleAr: 'تنظيف وتلميع الجنوط والكفرات بالكيميكال',
@@ -278,7 +279,7 @@ export const DEFAULT_GALLERY_ITEMS: GalleryMediaItem[] = [
     category: 'detailing',
   },
   {
-    id: 'gal-3',
+    id: 'photo-3',
     type: 'image',
     url: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1200&q=80',
     titleAr: 'تعقيم مجاري التكييف بالبخار الحار',
@@ -288,7 +289,7 @@ export const DEFAULT_GALLERY_ITEMS: GalleryMediaItem[] = [
     category: 'steam',
   },
   {
-    id: 'gal-4',
+    id: 'photo-4',
     type: 'image',
     url: 'https://images.unsplash.com/photo-1507136566006-cfc505b114fc?auto=format&fit=crop&w=1200&q=80',
     titleAr: 'تكييس الدعاسات والقير وعصا التحكم',
@@ -298,7 +299,7 @@ export const DEFAULT_GALLERY_ITEMS: GalleryMediaItem[] = [
     category: 'detailing',
   },
   {
-    id: 'gal-5',
+    id: 'photo-5',
     type: 'image',
     url: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1200&q=80',
     titleAr: 'لمعان ونظافة فائقة لسيارات عملائنا',
@@ -308,15 +309,60 @@ export const DEFAULT_GALLERY_ITEMS: GalleryMediaItem[] = [
     category: 'wash',
   },
   {
-    id: 'gal-6',
-    type: 'video',
-    url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-    titleAr: 'تجربة الغسيل الشامل في مغسلة آر إم ستار',
-    titleEn: 'RM.STAR Premium Wash Experience',
-    descAr: 'جولة سريعة توضح دقة وسرعة طاقم العمل واستخدام أجود الخامات الأصلية.',
-    descEn: 'A showcase of our skilled crew in action with premium formulas.',
+    id: 'photo-6',
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80',
+    titleAr: 'صالة انتظار مكيفة ومريحة للعملاء',
+    titleEn: 'Air-Conditioned Waiting Lounge',
+    descAr: 'ضيافة وأجواء مريحة ومكيفة لمتابعة غسيل سيارتك بكل راحة.',
+    descEn: 'Comfortable waiting area while your car is being pampered.',
     category: 'facility',
+  },
+
+  // --- 2. Video Items ---
+  {
+    id: 'video-1',
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-car-washing-in-a-gas-station-43343-large.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=1200&q=80',
+    titleAr: 'تغطية الرغوة الثلجية الفائقة شامبو لايف لاينز',
+    titleEn: 'Active Snow Foam Bath Demonstration',
+    descAr: 'تغطية كاملة برغوة الشامبو الفاخرة لهيكل السيارة لتفكيك أصعب الأتربة وحماية الطلاء بدون احتكاك.',
+    descEn: 'Full thick snow foam bath lifting dirt particles safely without scratching.',
+    category: 'wash',
+  },
+  {
+    id: 'video-2',
+    type: 'video',
+    url: 'https://raw.githubusercontent.com/intel-iot-devkit/sample-videos/master/car-detection.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1200&q=80',
+    titleAr: 'رفع البستم وغسيل الشاسيه بمضخات الضغط العالي',
+    titleEn: 'Hydraulic Lift & Undercarriage Jet Wash',
+    descAr: 'غسيل هيدروليكي قوي بضغط مياه متوازن لإزالة تراكمات الطين والأملاح وحماية أسفل المركبة.',
+    descEn: 'High-pressure underbody wash removing road grime and mud build-up safely.',
+    category: 'facility',
+  },
+  {
+    id: 'video-3',
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-hands-cleaning-a-car-wheel-with-a-brush-43345-large.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1200&q=80',
+    titleAr: 'تلميع عميق للجنوط والكفرات وتفاصيل الديكور',
+    titleEn: 'Deep Wheel Care & Tire Dressing',
+    descAr: 'فرك كيميائي دقيق للجنوط والبطانات وتلميع أسود فاحم للكفرات يعيد لها رونقها.',
+    descEn: 'Precise rim detailing and deep tire shine application in action.',
+    category: 'detailing',
+  },
+  {
+    id: 'video-4',
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-car-washing-foam-drying-43344-large.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1200&q=80',
+    titleAr: 'تعقيم بالبخار الحار وتجفيف بمناشف مايكروفايبر',
+    titleEn: 'Steam Sanitization & Scratch-Free Drying',
+    descAr: 'تعقيم كامل لفتحات التكييف والمقاعد ثم تجفيف فائق النعومة بمناشف معقمة.',
+    descEn: 'Steam sanitization and scratch-free microfiber drying process.',
+    category: 'steam',
   },
 ];
 
@@ -345,8 +391,8 @@ export const DEFAULT_OFFERS: AppOffer[] = [
 ];
 
 export const DEFAULT_CONTACTS: BranchContactsConfig = {
-  rabwahPhone: '0563364380',
-  rabwahWhatsapp: '966563364380',
+  rabwahPhone: '0565444960',
+  rabwahWhatsapp: '966565444960',
   rabwahMaps: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
   rabwahReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJFQt3sEDRwxUR9NukTd-8i-g',
   qurayniyyahPhone: '0548589875',

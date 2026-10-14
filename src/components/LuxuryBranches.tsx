@@ -77,12 +77,12 @@ export function LuxuryBranches({
                   </p>
 
                   {/* Phone & Direct Contact */}
-                  <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80 mb-6 flex items-center justify-between">
-                    <div>
-                      <div className="text-[10px] text-slate-400">
+                  <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-cyan-500/30 mb-6 flex items-center justify-between shadow-inner">
+                    <div className="text-right">
+                      <div className="text-[10px] text-slate-400 font-medium">
                         {lang === 'ar' ? 'رقم الهاتف المباشر للفرع' : 'Direct Branch Phone'}
                       </div>
-                      <div className="text-sm font-black text-white font-mono dir-ltr">
+                      <div dir="ltr" className="text-sm sm:text-base font-black text-cyan-300 font-mono tracking-widest mt-0.5 text-left">
                         {branch.displayPhone}
                       </div>
                     </div>

@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { Phone, MessageCircle, Globe, Menu, X, Sparkles } from 'lucide-react';
-import { Language, translations } from '../data/translations';
+import { Phone, MessageCircle, Globe } from 'lucide-react';
+import { Language } from '../data/translations';
 import { AppCustomization } from '../data/customization';
-import { getDynamicBranches } from '../data/branches';
 import officialLogo from '../assets/images/rm_star_exact_logo_1790089128681.jpg';
 
 interface LuxuryNavbarProps {
   lang: Language;
   onToggleLang: () => void;
   customData: AppCustomization;
+  currentPage?: string;
+  onNavigatePage?: (page: string) => void;
   onOpenCallModal: () => void;
   onOpenWhatsAppModal: () => void;
   onTriggerSecretAdmin: () => void;
@@ -18,17 +19,16 @@ export function LuxuryNavbar({
   lang,
   onToggleLang,
   customData,
+  currentPage = 'home',
+  onNavigatePage,
   onOpenCallModal,
   onOpenWhatsAppModal,
   onTriggerSecretAdmin,
 }: LuxuryNavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<any>(null);
 
-  const branches = getDynamicBranches(customData);
-  const rabwah = branches[0];
   const activeLogo = customData.logoUrl || officialLogo;
 
   useEffect(() => {
@@ -58,12 +58,17 @@ export function LuxuryNavbar({
   };
 
   const scrollToSection = (id: string) => {
-    setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const yOffset = -70;
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+    const targetPage = id === 'hero' ? 'home' : id;
+    if (onNavigatePage) {
+      onNavigatePage(targetPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const element = document.getElementById(id);
+      if (element) {
+        const yOffset = -70;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
     }
   };
 
@@ -115,40 +120,64 @@ export function LuxuryNavbar({
         <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
           <button
             onClick={() => scrollToSection('hero')}
-            className="hover:text-cyan-400 transition-colors py-1 cursor-pointer"
+            className={`transition-all py-1 cursor-pointer ${
+              currentPage === 'home' || currentPage === 'hero'
+                ? 'text-cyan-300 font-bold border-b-2 border-cyan-400'
+                : 'hover:text-cyan-400'
+            }`}
           >
             {lang === 'ar' ? 'الرئيسية' : 'Home'}
           </button>
           <button
             onClick={() => scrollToSection('pricing')}
-            className="hover:text-cyan-400 transition-colors py-1 cursor-pointer"
+            className={`transition-all py-1 cursor-pointer ${
+              currentPage === 'pricing'
+                ? 'text-cyan-300 font-bold border-b-2 border-cyan-400'
+                : 'hover:text-cyan-400'
+            }`}
           >
             {lang === 'ar' ? 'الخدمات والأسعار' : 'Services & Pricing'}
           </button>
           <button
             onClick={() => scrollToSection('features')}
-            className="hover:text-cyan-400 transition-colors py-1 cursor-pointer"
+            className={`transition-all py-1 cursor-pointer ${
+              currentPage === 'features'
+                ? 'text-cyan-300 font-bold border-b-2 border-cyan-400'
+                : 'hover:text-cyan-400'
+            }`}
           >
             {lang === 'ar' ? 'المميزات والولاء' : 'Features & Loyalty'}
           </button>
           <button
             onClick={() => scrollToSection('branches')}
-            className="hover:text-cyan-400 transition-colors py-1 cursor-pointer"
+            className={`transition-all py-1 cursor-pointer ${
+              currentPage === 'branches'
+                ? 'text-cyan-300 font-bold border-b-2 border-cyan-400'
+                : 'hover:text-cyan-400'
+            }`}
           >
             {lang === 'ar' ? 'فروعنا بجدة' : 'Branches'}
           </button>
           {customData.showGalleryTab !== false && (
             <button
               onClick={() => scrollToSection('gallery')}
-              className="hover:text-cyan-400 transition-colors py-1 cursor-pointer"
+              className={`transition-all py-1 cursor-pointer ${
+                currentPage === 'gallery'
+                  ? 'text-cyan-300 font-bold border-b-2 border-cyan-400'
+                  : 'hover:text-cyan-400'
+              }`}
             >
-              {lang === 'ar' ? 'معرض الصور' : 'Gallery'}
+              {lang === 'ar' ? 'المعرض' : 'Gallery'}
             </button>
           )}
           {customData.showReviewsTab !== false && (
             <button
               onClick={() => scrollToSection('reviews')}
-              className="hover:text-cyan-400 transition-colors py-1 cursor-pointer"
+              className={`transition-all py-1 cursor-pointer ${
+                currentPage === 'reviews'
+                  ? 'text-cyan-300 font-bold border-b-2 border-cyan-400'
+                  : 'hover:text-cyan-400'
+              }`}
             >
               {lang === 'ar' ? 'آراء العملاء' : 'Reviews'}
             </button>
@@ -160,110 +189,32 @@ export function LuxuryNavbar({
           {/* Language Switcher */}
           <button
             onClick={onToggleLang}
-            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/60 text-slate-300 text-xs font-bold hover:text-cyan-300 hover:border-cyan-500/40 transition-all active:scale-95"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/60 text-slate-300 text-xs font-bold hover:text-cyan-300 hover:border-cyan-500/40 transition-all active:scale-95 cursor-pointer"
             title={lang === 'ar' ? 'English' : 'عربي'}
           >
-            <Globe className="w-3.5 h-3.5" />
+            <Globe className="w-3.5 h-3.5 text-cyan-400" />
             <span>{lang === 'ar' ? 'EN' : 'عربي'}</span>
           </button>
 
           {/* Call Button */}
           <button
             onClick={onOpenCallModal}
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-950/60 border border-blue-500/30 text-blue-200 text-xs font-bold hover:bg-blue-900/60 transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-950/60 border border-blue-500/30 text-blue-200 text-xs font-bold hover:bg-blue-900/60 transition-all active:scale-95 cursor-pointer"
           >
             <Phone className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{lang === 'ar' ? 'اتصال' : 'Call'}</span>
+            <span className="hidden xs:inline sm:inline">{lang === 'ar' ? 'اتصال' : 'Call'}</span>
           </button>
 
           {/* Primary WhatsApp CTA */}
           <button
             onClick={onOpenWhatsAppModal}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:brightness-110 transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:brightness-110 transition-all active:scale-95 cursor-pointer"
           >
             <MessageCircle className="w-3.5 h-3.5 fill-white/20" />
             <span>{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
           </button>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-white"
-            aria-label="القائمة"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#060913]/98 backdrop-blur-xl border-b border-cyan-500/20 px-4 py-4 space-y-2 animate-fadeIn shadow-2xl">
-          <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-800/80">
-            <button
-              onClick={() => scrollToSection('hero')}
-              className="py-2 px-3 rounded-lg bg-slate-900/60 text-right text-xs font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300"
-            >
-              🏠 {lang === 'ar' ? 'الرئيسية' : 'Home'}
-            </button>
-            <button
-              onClick={() => scrollToSection('pricing')}
-              className="py-2 px-3 rounded-lg bg-slate-900/60 text-right text-xs font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300"
-            >
-              💰 {lang === 'ar' ? 'الأسعار والخدمات' : 'Pricing'}
-            </button>
-            <button
-              onClick={() => scrollToSection('features')}
-              className="py-2 px-3 rounded-lg bg-slate-900/60 text-right text-xs font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300"
-            >
-              ✨ {lang === 'ar' ? 'المميزات وبطاقة الولاء' : 'Features'}
-            </button>
-            <button
-              onClick={() => scrollToSection('branches')}
-              className="py-2 px-3 rounded-lg bg-slate-900/60 text-right text-xs font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300"
-            >
-              📍 {lang === 'ar' ? 'فروعنا بجدة' : 'Branches'}
-            </button>
-            {customData.showGalleryTab !== false && (
-              <button
-                onClick={() => scrollToSection('gallery')}
-                className="py-2 px-3 rounded-lg bg-slate-900/60 text-right text-xs font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300"
-              >
-                📸 {lang === 'ar' ? 'معرض الصور' : 'Gallery'}
-              </button>
-            )}
-            {customData.showReviewsTab !== false && (
-              <button
-                onClick={() => scrollToSection('reviews')}
-                className="py-2 px-3 rounded-lg bg-slate-900/60 text-right text-xs font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300"
-              >
-                ⭐ {lang === 'ar' ? 'آراء العملاء' : 'Reviews'}
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between pt-1 text-xs">
-            <button
-              onClick={onToggleLang}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-bold"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>{lang === 'ar' ? 'English Language' : 'اللغة العربية'}</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenCallModal();
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-950/80 border border-blue-500/40 text-cyan-300 font-bold"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              <span>{lang === 'ar' ? 'اتصال فوري' : 'Call Now'}</span>
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

@@ -1,97 +1,182 @@
-import { motion } from 'motion/react';
-import { Home, Tag, MapPin, Sparkles, Star, Share2, Trophy, Camera } from 'lucide-react';
-import { Language, translations } from '../data/translations';
-
-export type PageTab =
-  | 'home'
-  | 'prices'
-  | 'branches'
-  | 'services'
-  | 'gallery'
-  | 'competitions'
-  | 'reviews'
-  | 'links';
+import React, { useEffect, useRef } from 'react';
+import {
+  Home,
+  Tag,
+  Sparkles,
+  MapPin,
+  Camera,
+  Star,
+} from 'lucide-react';
+import { Language } from '../data/translations';
+import { AppPage } from '../App';
 
 interface BottomNavigationProps {
-  currentTab: PageTab;
-  onTabChange: (tab: PageTab) => void;
   lang: Language;
-  showReviewsTab?: boolean;
-  showCompetitionsTab?: boolean;
+  currentPage: AppPage;
+  onNavigatePage: (page: AppPage) => void;
   showGalleryTab?: boolean;
+  showReviewsTab?: boolean;
+}
+
+interface NavButtonConfig {
+  id: AppPage;
+  emoji: string;
+  icon: React.ComponentType<{ className?: string }>;
+  labelAr: string;
+  labelEn: string;
 }
 
 export function BottomNavigation({
-  currentTab,
-  onTabChange,
   lang,
-  showReviewsTab = true,
-  showCompetitionsTab = true,
+  currentPage,
+  onNavigatePage,
   showGalleryTab = true,
+  showReviewsTab = true,
 }: BottomNavigationProps) {
-  const t = translations[lang];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<{ [key in AppPage]?: HTMLButtonElement | null }>({});
 
-  const tabs = [
-    { id: 'home' as PageTab, label: t.tabHome, icon: Home },
-    { id: 'prices' as PageTab, label: t.tabPrices, icon: Tag, badge: 'جديد' },
-    { id: 'branches' as PageTab, label: t.tabBranches, icon: MapPin, badge: '24h' },
-    { id: 'services' as PageTab, label: t.tabServices, icon: Sparkles },
+  const buttons: NavButtonConfig[] = [
+    {
+      id: 'home',
+      emoji: '🏠',
+      icon: Home,
+      labelAr: 'الرئيسية',
+      labelEn: 'Home',
+    },
+    {
+      id: 'pricing',
+      emoji: '💰',
+      icon: Tag,
+      labelAr: 'الأسعار والخدمات',
+      labelEn: 'Pricing',
+    },
+    {
+      id: 'features',
+      emoji: '✨',
+      icon: Sparkles,
+      labelAr: 'المميزات والولاء',
+      labelEn: 'Features',
+    },
+    {
+      id: 'branches',
+      emoji: '📍',
+      icon: MapPin,
+      labelAr: 'فروعنا بجدة',
+      labelEn: 'Branches',
+    },
     ...(showGalleryTab !== false
-      ? [{ id: 'gallery' as PageTab, label: t.tabGallery, icon: Camera }]
-      : []),
-    ...(showCompetitionsTab !== false
-      ? [{ id: 'competitions' as PageTab, label: t.tabCompetitions, icon: Trophy, badge: '🏆' }]
+      ? [
+          {
+            id: 'gallery' as AppPage,
+            emoji: '📸',
+            icon: Camera,
+            labelAr: 'المعرض',
+            labelEn: 'Gallery',
+          },
+        ]
       : []),
     ...(showReviewsTab !== false
-      ? [{ id: 'reviews' as PageTab, label: t.tabReview, icon: Star }]
+      ? [
+          {
+            id: 'reviews' as AppPage,
+            emoji: '⭐',
+            icon: Star,
+            labelAr: 'آراء العملاء',
+            labelEn: 'Reviews',
+          },
+        ]
       : []),
-    { id: 'links' as PageTab, label: t.tabLinks, icon: Share2 },
   ];
 
+  // Auto-center the active button in the scrollable bottom dock on mobile
+  useEffect(() => {
+    const activeBtnEl = buttonRefs.current[currentPage];
+    const container = containerRef.current;
+    if (activeBtnEl && container) {
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = activeBtnEl.getBoundingClientRect();
+      const scrollOffset =
+        btnRect.left -
+        containerRect.left -
+        containerRect.width / 2 +
+        btnRect.width / 2;
+
+      container.scrollBy({ left: scrollOffset, behavior: 'smooth' });
+    }
+  }, [currentPage]);
+
+  const handleButtonClick = (pageId: AppPage) => {
+    onNavigatePage(pageId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 px-2 pt-1 pb-[max(8px,env(safe-area-inset-bottom,8px))] pointer-events-none">
-      <div className="w-full max-w-md mx-auto pointer-events-auto">
-        <div className="flex items-center justify-between p-1 rounded-2xl bg-[#070b16]/95 backdrop-blur-xl border border-cyan-400/30 shadow-[0_0_25px_rgba(0,102,255,0.35)] overflow-x-auto scrollbar-none">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = currentTab === tab.id;
+    <nav
+      aria-label={lang === 'ar' ? 'أزرار التنقل الرئيسية أسفل الشاشة' : 'Bottom navigation buttons'}
+      className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none pb-[max(8px,env(safe-area-inset-bottom,8px))] pt-1 px-2 sm:px-4"
+    >
+      <div className="max-w-4xl mx-auto pointer-events-auto">
+        {/* Ambient Neon Glow behind the buttons dock */}
+        <div className="relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/30 via-cyan-400/40 to-blue-600/30 rounded-2xl blur-lg opacity-70 pointer-events-none" />
 
-            return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  onTabChange(tab.id);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className={`relative flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-xl transition-all active:scale-95 touch-manipulation select-none min-h-[46px] min-w-[42px] ${
-                  isActive
-                    ? 'text-cyan-300 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabPill"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600/40 via-cyan-500/30 to-blue-600/40 border border-cyan-400/50 shadow-[0_0_12px_rgba(0,210,255,0.4)]"
-                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                  />
-                )}
+          {/* Buttons Container: Flex dock with tactile, distinct button tiles */}
+          <div
+            ref={containerRef}
+            className="relative flex items-center justify-start md:justify-center gap-1.5 sm:gap-2 p-2 rounded-2xl bg-[#060913]/95 backdrop-blur-2xl border border-cyan-400/35 shadow-[0_8px_30px_rgba(0,0,0,0.85)] overflow-x-auto scrollbar-none touch-manipulation select-none"
+            dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          >
+            {buttons.map((btn) => {
+              const Icon = btn.icon;
+              const isActive = currentPage === btn.id;
 
-                <div className="relative flex items-center justify-center">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-300 drop-shadow-[0_0_8px_#00e5ff]' : ''}`} />
-                  {tab.badge && !isActive && (
-                    <span className="absolute -top-1 -right-2 px-1 py-0.2 rounded-full bg-cyan-400 text-black text-[7px] font-black leading-none pointer-events-none">
-                      {tab.badge}
+              return (
+                <button
+                  key={btn.id}
+                  ref={(el) => {
+                    buttonRefs.current[btn.id] = el;
+                  }}
+                  type="button"
+                  onClick={() => handleButtonClick(btn.id)}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`group relative flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 touch-manipulation border ${
+                    isActive
+                      ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-blue-700 text-white border-cyan-300 shadow-[0_0_18px_rgba(6,182,212,0.55)] font-black'
+                      : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-cyan-500/50 hover:bg-slate-800/90 hover:text-white'
+                  }`}
+                >
+                  {/* Emoji & Icon Container */}
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs sm:text-sm select-none" role="img" aria-hidden="true">
+                      {btn.emoji}
                     </span>
-                  )}
-                </div>
+                    <Icon
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200 ${
+                        isActive
+                          ? 'text-cyan-100 scale-110 drop-shadow-[0_0_6px_#ffffff]'
+                          : 'text-slate-400 group-hover:text-cyan-300'
+                      }`}
+                    />
+                  </div>
 
-                <span className="relative text-[8px] sm:text-[9px] mt-0.5 whitespace-nowrap tracking-tight font-medium">
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
+                  {/* Button Label Text */}
+                  <span
+                    className={`text-[11px] sm:text-xs font-['Alexandria',sans-serif] tracking-tight ${
+                      isActive ? 'font-black text-white' : 'font-semibold'
+                    }`}
+                  >
+                    {lang === 'ar' ? btn.labelAr : btn.labelEn}
+                  </span>
+
+                  {/* Active Indicator Glow Dot */}
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-200 shadow-[0_0_6px_#38bdf8] animate-pulse" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </nav>

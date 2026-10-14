@@ -111,8 +111,8 @@ export function WhatsAppModal({ isOpen, onClose, lang, customData }: WhatsAppMod
                             ? 'Al Rabwah'
                             : 'Al Qurayniyyah'}
                       </span>
-                      <span className="text-[10px] text-slate-400 mt-1 flex items-center justify-between font-mono">
-                        <span>{branch.displayPhone}</span>
+                      <span className="text-[10px] text-slate-300 mt-1 flex items-center justify-between font-mono">
+                        <span dir="ltr" className="tracking-wider">{branch.displayPhone}</span>
                         {isSelected && <Check className="w-3 h-3 text-emerald-400" />}
                       </span>
                     </button>

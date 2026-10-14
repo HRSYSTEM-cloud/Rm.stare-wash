@@ -88,7 +88,7 @@ export function CallModal({ isOpen, onClose, lang, customData }: CallModalProps)
                                 ? 'Al Rabwah Branch'
                                 : 'Al Qurayniyyah Branch'}
                           </div>
-                          <div className="text-xs font-mono text-cyan-300 tracking-wide font-bold">
+                          <div dir="ltr" className="text-xs font-mono text-cyan-300 tracking-wider font-bold text-left">
                             {branch.displayPhone}
                           </div>
                         </div>

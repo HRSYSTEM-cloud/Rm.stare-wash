@@ -6,14 +6,14 @@ export const BASE_BRANCHES: BranchInfo[] = [
     id: 'al-rabwah',
     name: 'فرع الربوة — جدة',
     badgeColor: 'bg-red-500/20 text-red-400 border-red-500/40',
-    badgeLabel: '🔴 فرع الربوة',
+    badgeLabel: '🔴 فرع الربوة (شارع الستين)',
     district: 'حي الربوة',
     city: 'جدة',
     postalCode: '23533',
     streetAddress: 'تقاطع طريق الملك فهد (الستين) مع شارع يحيى المعلمي، حي الربوة',
-    phone: '0563364380',
-    displayPhone: '056 336 4380',
-    whatsappNumber: '966563364380',
+    phone: '0565444960',
+    displayPhone: '056 544 4960',
+    whatsappNumber: '966565444960',
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
     googleReviewUrl: 'https://www.google.com/maps/search/?api=1&query=21.5791,39.1863+(مغسلة+آر+إم+ستار+فرع+الربوة+جدة)',
     embedMapQuery: 'Jeddah+Al+Rabwah+King+Fahd+Road+Yahya+Al+Moalimi',
@@ -24,7 +24,7 @@ export const BASE_BRANCHES: BranchInfo[] = [
     id: 'al-qurayniyyah',
     name: 'فرع القرينية — جدة',
     badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/40',
-    badgeLabel: '🔵 فرع القرينية',
+    badgeLabel: '🔵 فرع القرينية (الخمرة)',
     district: 'حي القرينية',
     city: 'جدة',
     postalCode: '22535',
@@ -40,13 +40,21 @@ export const BASE_BRANCHES: BranchInfo[] = [
   },
 ];
 
-// Helper to format 05XXXXXXXX to 05X XXX XXXX
-function formatDisplayPhone(phone: string): string {
-  const clean = phone.replace(/\s+/g, '');
-  if (clean.length === 10) {
-    return `${clean.slice(0, 3)} ${clean.slice(3, 6)} ${clean.slice(6)}`;
+// Helper to format any phone number consistently into 05X XXX XXXX format
+export function formatDisplayPhone(phone: string): string {
+  if (!phone) return '';
+  const digits = phone.replace(/[^0-9]/g, '');
+  if (digits.startsWith('966') && digits.length >= 11) {
+    const local = '0' + digits.slice(3);
+    if (local.length === 10) {
+      return `${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6)}`;
+    }
+    return local;
   }
-  return clean;
+  if (digits.length === 10 && digits.startsWith('05')) {
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  }
+  return phone;
 }
 
 // Generate dynamic branches merging custom saved cloud admin values
